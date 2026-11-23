@@ -1,6 +1,7 @@
 # AmazonMercury · Maqueta 3D web
 
 Maqueta 3D interactiva del nodo flotante de monitoreo de mercurio (ISC 2027 · Amazonía Viva).
+link de la maqueta 3D: https://erick-ucsm.github.io/AmazonMercury/
 
 ## Estructura de la carpeta
 
