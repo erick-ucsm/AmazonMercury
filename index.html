@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AmazonMercury · Nodo flotante de monitoreo de mercurio</title>
+  <meta name="description" content="Maqueta 3D interactiva del nodo flotante AmazonMercury: monitoreo de mercurio en ríos amazónicos con LoRa 433 MHz. ISC 2027 · Amazonía Viva.">
+  <meta name="theme-color" content="#06231f">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 4C22 18 12 28 12 40a20 20 0 0 0 40 0C52 28 42 18 32 4z' fill='%2322c39a'/%3E%3Cpath d='M22 42c6-1 13-6 18-14' stroke='%23ffffff' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="visor" aria-label="Maqueta 3D del nodo flotante"></div>
+
+  <header class="topbar">
+    <div class="marca">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 4C22 18 12 28 12 40a20 20 0 0 0 40 0C52 28 42 18 32 4z" fill="url(#gLogo)"/>
+        <path d="M22 42c6-1 13-6 18-14" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M27 40c-1-4 0-7 3-9M33 37c0-3 2-6 5-7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>
+        <defs><linearGradient id="gLogo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs>
+      </svg>
+      <div>
+        <h1>AmazonMercury</h1>
+        <p class="subtitulo">Nodo flotante de monitoreo de mercurio · Madre de Dios</p>
+      </div>
+    </div>
+    <button id="btnProyecto" class="btn btn-primario">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+      <span class="txt-largo">Ver información del proyecto</span><span class="txt-corto">Proyecto</span>
+    </button>
+  </header>
+
+  <section class="lateral">
+    <article class="tarjeta intro">
+      <div class="chips">
+        <span class="chip">ISC 2027</span>
+        <span class="chip chip-azul">Amazonía Viva</span>
+      </div>
+      <p>Red de <strong>nodos flotantes</strong> que miden mercurio en el agua de forma periódica y envían los datos por <strong>LoRa 433 MHz</strong> a una plataforma web con alertas para autoridades y comunidades.</p>
+      <p class="pista">Gira con el mouse o el dedo, haz zoom y <strong>toca cualquier pieza</strong> para ver su información.</p>
+    </article>
+    <nav class="tarjeta lista" aria-label="Componentes del nodo">
+      <h3>Componentes</h3>
+      <ol id="listaComponentes"></ol>
+    </nav>
+  </section>
+
+  <aside id="panelInfo" class="tarjeta panel-info" aria-hidden="true" aria-live="polite">
+    <button id="cerrarInfo" class="btn-cerrar" aria-label="Cerrar">&times;</button>
+    <div class="pi-cabecera">
+      <span id="piNum" class="pi-num">1</span>
+      <div>
+        <p id="piCat" class="pi-cat">Estructura</p>
+        <h2 id="piNombre">Componente</h2>
+      </div>
+    </div>
+    <div class="pi-bloque">
+      <h4>Función</h4>
+      <p id="piFuncion"></p>
+    </div>
+    <div class="pi-bloque">
+      <h4>Descripción</h4>
+      <p id="piInfo"></p>
+    </div>
+    <ul id="piSpecs" class="pi-specs"></ul>
+    <p id="piAviso" class="pi-aviso" hidden></p>
+    <div class="pi-nav">
+      <button id="piPrev" class="btn btn-fantasma">&larr; Anterior</button>
+      <button id="piNext" class="btn btn-fantasma">Siguiente &rarr;</button>
+    </div>
+  </aside>
+
+  <div id="hud" class="tarjeta hud" hidden>
+    <div class="hud-pasos" id="hudPasos"></div>
+    <p id="hudTexto" class="hud-texto"></p>
+    <div class="hud-barra"><span id="hudBarra"></span></div>
+    <p id="hudLectura" class="hud-lectura" hidden></p>
+  </div>
+
+  <div class="toolbar" role="toolbar" aria-label="Controles de la maqueta">
+    <button id="btnRotar" class="btn-herr activo" title="Pausar / reanudar rotación">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
+      <span>Rotación</span>
+    </button>
+    <button id="btnExplosion" class="btn-herr" title="Separar las piezas">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="8" height="8" rx="1.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M5 19l2-2"/></svg>
+      <span>Explosionada</span>
+    </button>
+    <button id="btnRayos" class="btn-herr" title="Ver el interior (casco y caja transparentes)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>Interior</span>
+    </button>
+    <button id="btnEtiquetas" class="btn-herr activo" title="Mostrar / ocultar etiquetas">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8L3 12z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+      <span>Etiquetas</span>
+    </button>
+    <button id="btnAgua" class="btn-herr activo" title="Mostrar / ocultar el río">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 14c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 20c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/></svg>
+      <span>Río</span>
+    </button>
+    <button id="btnReset" class="btn-herr" title="Restablecer la vista">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></svg>
+      <span>Vista</span>
+    </button>
+    <button id="btnCiclo" class="btn-herr btn-ciclo" title="Simular un ciclo de muestreo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C8 9 6 12 6 15a6 6 0 0 0 12 0c0-3-2-6-6-12z"/><path d="M10 15h4"/></svg>
+      <span>Simular muestreo</span>
+    </button>
+  </div>
+
+  <div id="tooltip" class="tooltip" hidden></div>
+  <div id="modoModelo" class="modo-modelo"></div>
+
+  <div id="cargador" class="cargador">
+    <div class="cargador-caja">
+      <svg class="logo grande" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 4C22 18 12 28 12 40a20 20 0 0 0 40 0C52 28 42 18 32 4z" fill="url(#gLogo2)"/>
+        <path d="M22 42c6-1 13-6 18-14" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <defs><linearGradient id="gLogo2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs>
+      </svg>
+      <p class="cargador-titulo">AmazonMercury</p>
+      <div class="cargador-barra"><span id="cargadorBarra"></span></div>
+      <p id="cargadorTexto" class="cargador-texto">Preparando la escena 3D…</p>
+    </div>
+  </div>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-fondo" data-cerrar></div>
+    <article class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+      <button class="btn-cerrar" data-cerrar aria-label="Cerrar">&times;</button>
+      <p class="modal-pre">Impact Startup Competition 2027 · Incubadora Scale UCSM</p>
+      <h2 id="modalTitulo">AmazonMercury</h2>
+      <p class="modal-lema">Monitoreo automatizado y de bajo costo de mercurio en ríos amazónicos.</p>
+
+      <div class="modal-grid">
+        <section class="modal-bloque problema">
+          <h3>El problema</h3>
+          <p>En Madre de Dios, la minería ilegal de oro contamina los ríos con mercurio. Hoy el monitoreo es <strong>manual</strong>: se recolectan muestras y se envían a laboratorio. Es lento, de baja frecuencia y no existen <strong>alertas tempranas</strong>.</p>
+        </section>
+        <section class="modal-bloque solucion">
+          <h3>Nuestra solución</h3>
+          <p>Una red de <strong>nodos flotantes</strong> que toman muestras de agua cada cierto tiempo, miden mercurio con un sensor electroquímico y transmiten por <strong>LoRa 433 MHz</strong> a una puerta de enlace, sin depender de señal celular.</p>
+        </section>
+      </div>
+
+      <h3 class="modal-sub">¿Cómo funciona?</h3>
+      <svg class="diagrama" viewBox="0 0 720 150" role="img" aria-label="Flujo: nodos flotantes, puerta de enlace LoRa, plataforma web">
+        <defs>
+          <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5eead4"/></marker>
+        </defs>
+        <path d="M0 118c40 0 40-8 80-8s40 8 80 8 40-8 80-8 40 8 80 8" stroke="#38bdf8" stroke-width="3" fill="none" opacity=".6"/>
+        <g fill="#0f3b35" stroke="#34d399" stroke-width="2">
+          <circle cx="60" cy="98" r="16"/><circle cx="150" cy="104" r="16"/><circle cx="240" cy="98" r="16"/>
+        </g>
+        <g stroke="#e2e8f0" stroke-width="2"><path d="M60 82V58M150 88V64M240 82V58"/></g>
+        <g fill="none" stroke="#5eead4" stroke-width="1.6" opacity=".7"><path d="M52 50a12 12 0 0 1 16 0M142 56a12 12 0 0 1 16 0M232 50a12 12 0 0 1 16 0"/></g>
+        <path d="M268 70C320 50 340 50 380 62" stroke="#5eead4" stroke-width="2" stroke-dasharray="6 5" fill="none" marker-end="url(#flecha)"/>
+        <rect x="390" y="40" width="96" height="64" rx="10" fill="#0f3b35" stroke="#38bdf8" stroke-width="2"/>
+        <path d="M438 40V18" stroke="#e2e8f0" stroke-width="2"/>
+        <text x="438" y="70" fill="#e2e8f0" font-size="13" text-anchor="middle" font-family="Inter">Puerta de</text>
+        <text x="438" y="87" fill="#e2e8f0" font-size="13" text-anchor="middle" font-family="Inter">enlace LoRa</text>
+        <path d="M490 72h70" stroke="#5eead4" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#flecha)"/>
+        <rect x="570" y="30" width="140" height="88" rx="10" fill="#0f3b35" stroke="#34d399" stroke-width="2"/>
+        <rect x="582" y="44" width="56" height="34" rx="4" fill="#134e48"/>
+        <circle cx="600" cy="58" r="4" fill="#34d399"/><circle cx="618" cy="66" r="4" fill="#f87171"/>
+        <path d="M648 70l12-12 12 8 16-18" stroke="#5eead4" stroke-width="2" fill="none"/>
+        <text x="640" y="104" fill="#e2e8f0" font-size="13" text-anchor="middle" font-family="Inter">Plataforma web</text>
+        <text x="150" y="145" fill="#94a3b8" font-size="12" text-anchor="middle" font-family="Inter">Nodos flotantes en el río</text>
+      </svg>
+
+      <ol class="pasos">
+        <li><span>1</span><div><strong>Muestrea.</strong> La compuerta se abre unos segundos y entra una pequeña muestra de agua a la cámara.</div></li>
+        <li><span>2</span><div><strong>Mide.</strong> El sensor de iones de mercurio (Hg-ISE) analiza la muestra; el ESP32 procesa la señal.</div></li>
+        <li><span>3</span><div><strong>Transmite.</strong> El módulo LoRa 433 MHz envía la lectura a la puerta de enlace, a varios kilómetros.</div></li>
+        <li><span>4</span><div><strong>Alerta.</strong> La plataforma web muestra concentraciones, ubicación de cada nodo y alertas tempranas.</div></li>
+      </ol>
+
+      <div class="modal-pie">
+        <div><span class="etq">Desafío</span><strong>Amazonía Viva</strong></div>
+        <div><span class="etq">Vertical</span><strong>Biodiversidad, regeneración y resiliencia climática</strong></div>
+        <div><span class="etq">Equipo</span><strong>Ing. de Sistemas + Ing. Mecatrónica · UCSM</strong></div>
+      </div>
+    </article>
+  </div>
+
+  <noscript><p class="noscript">Esta maqueta necesita JavaScript activado.</p></noscript>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
