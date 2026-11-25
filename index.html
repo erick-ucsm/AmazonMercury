@@ -196,6 +196,14 @@
   </div>
 
   <noscript><p class="noscript">Esta maqueta necesita JavaScript activado.</p></noscript>
+  <script>
+    if (location.protocol === 'file:') {
+      document.addEventListener('DOMContentLoaded', function () {
+        var t = document.getElementById('cargadorTexto');
+        if (t) t.innerHTML = 'La maqueta 3D no funciona abriendo el archivo con doble clic.<br>Ábrela con <b>Live Server</b> (VS Code), con <b>python -m http.server</b> o desde <b>GitHub Pages</b>.';
+      });
+    }
+  </script>
   <script type="module" src="script.js"></script>
 </body>
 </html>
