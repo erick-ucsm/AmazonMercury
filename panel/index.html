@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AmazonMercury · Panel de control</title>
+  <title>AmazonMercury · Panel profesional</title>
   <meta name="description" content="Panel de control de la red AmazonMercury: historial de mercurio y metales, mapa de nodos, alertas y diagnóstico de emergencia del río.">
   <meta name="theme-color" content="#0b2236">
   <link rel="icon" type="image/png" href="../assets/favicon.png">
@@ -18,7 +18,7 @@
       <span class="logo-tile"><img src="../assets/logo-icono.png" alt="Logo AmazonMercury"></span>
       <div>
         <h1>AmazonMercury</h1>
-        <p>Panel de control · Red de monitoreo del río Madre de Dios</p>
+        <p>Panel profesional · Para clientes y autoridades</p>
       </div>
     </div>
     <div class="cab-derecha">
@@ -26,6 +26,10 @@
         <span class="punto"></span><span id="estadoMaquetaTxt">Maqueta 3D: no conectada</span>
       </div>
       <div class="reloj"><span id="reloj">--:--</span><small>Hora de Lima</small></div>
+      <button id="btnMiRio" class="btn btn-borde-claro" title="Abrir el panel para la comunidad">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C8 9 6 12 6 15a6 6 0 0 0 12 0c0-3-2-6-6-12z"/></svg>
+        Mi Río (comunidad)
+      </button>
       <button id="btnMaqueta" class="btn btn-claro">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg>
         Abrir maqueta 3D
@@ -172,6 +176,17 @@
           <tbody id="tablaEventos"></tbody>
         </table>
       </div>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-cab">
+        <div>
+          <h3>Reportes de la comunidad</h3>
+          <p class="nota">Lo que envían los pobladores desde Mi Río y los Guardianes del Río</p>
+        </div>
+        <span class="etiqueta-estado nd" id="numReportes">0</span>
+      </div>
+      <div id="listaReportes" class="reportes"></div>
     </section>
 
     <footer class="pie">

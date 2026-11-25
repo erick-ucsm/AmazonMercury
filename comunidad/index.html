@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Mi Río · AmazonMercury</title>
+  <meta name="description" content="Mi Río: mira de forma sencilla cómo está el agua del río en tu comunidad, con alertas de AmazonMercury.">
+  <meta name="theme-color" content="#1f7a8c">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="comunidad.css">
+</head>
+<body>
+  <header class="cab">
+    <div class="marca">
+      <img src="../assets/logo-icono.png" alt="" class="logo">
+      <div>
+        <h1>Mi Río</h1>
+        <p>por AmazonMercury</p>
+      </div>
+    </div>
+    <div class="vivo" id="vivo"><span class="punto"></span><span id="vivoTxt">En vivo</span></div>
+  </header>
+
+  <nav class="lugares" id="lugares" aria-label="Elige tu comunidad"></nav>
+
+  <div id="banner" class="banner" hidden role="alert"></div>
+  <div id="midiendo" class="midiendo" hidden aria-live="polite"></div>
+
+  <main class="contenido">
+    <section class="tarjeta estado" id="tarjetaEstado" aria-live="polite">
+      <div class="escena" aria-hidden="true">
+        <svg viewBox="0 0 400 140" preserveAspectRatio="none" class="olas">
+          <path class="ola o1" d="M0 70 C60 50 120 90 200 70 S340 50 400 70 V140 H0z"/>
+          <path class="ola o2" d="M0 95 C70 80 130 112 200 96 S330 80 400 96 V140 H0z"/>
+        </svg>
+      </div>
+      <div class="estado-cuerpo">
+        <div class="gota" id="gota"></div>
+        <div class="estado-texto">
+          <p class="estado-lugar" id="estadoLugar">Agua del río</p>
+          <h2 id="estadoTitulo">Bien</h2>
+          <p class="estado-frase" id="estadoFrase"></p>
+          <button class="btn-escuchar" id="btnEscuchar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+            Escuchar
+          </button>
+        </div>
+      </div>
+      <div class="medidor-hg">
+        <div class="mh-cab"><strong>Mercurio en el agua</strong><span id="hgNivel" class="hg-nivel">Bajo</span></div>
+        <div class="mh-barra"><span class="z1">Bajo</span><span class="z2">Medio</span><span class="z3">Alto</span><i id="hgMarca"></i></div>
+        <button class="ver-detalle" id="btnDetalle" aria-expanded="false">Ver el número exacto</button>
+        <p class="detalle" id="detalle" hidden></p>
+      </div>
+      <p class="actualizado" id="actualizado"></p>
+    </section>
+
+    <section class="tarjeta hoy">
+      <h3>¿Qué hago hoy?</h3>
+      <ul class="consejos" id="consejos"></ul>
+    </section>
+
+    <section class="tarjeta semana">
+      <h3>Los últimos 7 días</h3>
+      <ol class="dias" id="dias"></ol>
+      <p class="leyenda"><span class="c normal"></span>Bien <span class="c precaucion"></span>Cuidado <span class="c alerta"></span>No usar</p>
+    </section>
+
+    <section class="tarjeta rio">
+      <h3>A lo largo del río</h3>
+      <ul class="tramos" id="tramos"></ul>
+    </section>
+
+    <section class="tarjeta guardian">
+      <div class="g-avatar" aria-hidden="true">
+        <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="40" fill="#e3f3ee"/><circle cx="40" cy="31" r="13" fill="#2f8a57"/><path d="M16 70c3-15 13-22 24-22s21 7 24 22" fill="#2f8a57"/><path d="M25 25c4-9 26-9 30 0z" fill="#f28c28"/><rect x="22" y="24" width="36" height="4" rx="2" fill="#f28c28"/></svg>
+      </div>
+      <div>
+        <h3>Tu Guardián del Río</h3>
+        <p id="guardianTxt">Persona de la comunidad capacitada que cuida el nodo y lo limpia cada día.</p>
+        <p class="g-visita" id="guardianVisita"></p>
+      </div>
+    </section>
+
+    <section class="tarjeta acciones">
+      <button class="btn-grande reportar" id="btnReportar">
+        <span class="ico">📣</span>
+        <span><strong>Reportar algo raro</strong><small>Color del agua, peces muertos, dragas…</small></span>
+      </button>
+      <button class="btn-grande avisos" id="btnAvisos">
+        <span class="ico">🔔</span>
+        <span><strong>Recibir alertas en mi celular</strong><small>Por WhatsApp o SMS</small></span>
+      </button>
+    </section>
+
+    <section class="tarjeta sabias">
+      <h3>¿Sabías que…?</h3>
+      <p>Los peces grandes que se comen a otros peces guardan más mercurio en su carne. Para niñas, niños y mujeres embarazadas, es mejor elegir <strong>peces pequeños</strong>.</p>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>Datos simulados para la demostración · AmazonMercury, ISC 2027.</p>
+    <p>"Bien", "Cuidado" y "No usar" siguen los valores guía de la OMS para agua de consumo. Próximamente en harakbut y ese eja.</p>
+  </footer>
+
+  <div class="modal" id="modalReporte" hidden>
+    <div class="modal-fondo" data-cerrar></div>
+    <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="tReporte">
+      <button class="x" data-cerrar aria-label="Cerrar">&times;</button>
+      <h3 id="tReporte">¿Qué viste en el río?</h3>
+      <div class="opciones" id="opcionesReporte"></div>
+      <label class="comentario">
+        <span>Cuéntanos un poco más (opcional)</span>
+        <textarea id="textoReporte" rows="3" maxlength="240" placeholder="Por ejemplo: desde la mañana el agua bajó muy marrón"></textarea>
+      </label>
+      <button class="btn-enviar" id="btnEnviarReporte" disabled>Enviar reporte</button>
+      <p class="nota">Tu reporte llega al equipo de AmazonMercury y al Guardián del Río.</p>
+    </div>
+  </div>
+
+  <div class="aviso" id="aviso" hidden></div>
+
+  <script type="module" src="comunidad.js"></script>
+</body>
+</html>

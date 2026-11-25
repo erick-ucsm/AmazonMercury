@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AmazonMercury · Pitch ISC 2027</title>
+  <meta name="description" content="Pitch de AmazonMercury: monitoreo continuo de mercurio y metales en ríos amazónicos. La minería paga, la comunidad recibe las alertas. ISC 2027 · Amazonía Viva.">
+  <meta name="theme-color" content="#0b2236">
+  <link rel="icon" href="assets/logo-icono.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="escenario">
+<main id="deck" aria-live="polite">
+
+<!-- 1 · GANCHO -->
+<section class="slide oscuro pregunta gancho" data-titulo="Gancho: Bayolet" data-arte="rio">
+  <svg class="arte-rio" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <div class="marca-esquina anim" data-d="0"><img src="assets/logo-icono.png" alt=""><span>AmazonMercury · Equipo EcoRaiz · UCSM</span></div>
+  <div class="pregunta-texto">
+    <p class="sobretitulo anim" data-d="1">Shintuya, Madre de Dios</p>
+    <h2 class="anim" data-d="2">Bayolet se desmayó dos veces en el colegio. <em>Tenía 5 años.</em></h2>
+    <p class="sub anim" data-d="4">Tenía mercurio en el cuerpo. Su comunidad <strong>no tiene minería</strong>: llegó por el río, dentro de los peces.</p>
+  </div>
+  <p class="fuentes">Fuente: Mongabay Latam (2026).</p>
+  <aside class="notas">
+    <p><b>[Erick] · 0:00–0:20 · tono tranquilo, mirando al jurado</b></p>
+    <p>Bayolet vive en Shintuya, en Madre de Dios. A los 5 años se desmayó dos veces en el colegio. Tenía mercurio en el cuerpo.</p>
+    <p>Su comunidad no tiene minería: el mercurio llegó por el río, dentro de los peces que comía su familia. Hoy tiene 16 años y todavía le cuesta concentrarse.</p>
+  </aside>
+</section>
+
+<!-- 2 · PROBLEMA -->
+<section class="slide oscuro problema" data-titulo="El problema">
+  <div class="problema-grid p2">
+    <div class="mapa anim" data-d="1">
+      <svg viewBox="0 0 760 640" role="img" aria-label="Esquema de los ríos de Madre de Dios con zonas mineras y comunidades afectadas">
+        <defs>
+          <radialGradient id="gMancha"><stop offset="0" stop-color="#f28c28" stop-opacity=".75"/><stop offset="1" stop-color="#f28c28" stop-opacity="0"/></radialGradient>
+          <pattern id="pSelva" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="4" fill="#1d5b3f"/><circle cx="17" cy="15" r="5" fill="#1a5139"/></pattern>
+        </defs>
+        <rect x="0" y="0" width="760" height="640" rx="24" fill="#123a2c"/>
+        <rect x="0" y="0" width="760" height="640" rx="24" fill="url(#pSelva)" opacity=".55"/>
+        <g class="manchas">
+          <ellipse cx="300" cy="420" rx="120" ry="70" fill="url(#gMancha)"/>
+          <ellipse cx="410" cy="470" rx="110" ry="60" fill="url(#gMancha)"/>
+          <ellipse cx="255" cy="330" rx="70" ry="50" fill="url(#gMancha)"/>
+        </g>
+        <g fill="none" stroke-linecap="round" class="rios">
+          <path d="M40 210C120 230 170 250 230 300S320 360 400 340 520 300 600 330 700 350 740 340" stroke="#5ec4d6" stroke-width="12"/>
+          <path d="M150 560C200 520 230 480 260 430S300 360 320 352" stroke="#5ec4d6" stroke-width="7"/>
+          <path d="M220 160C230 220 236 260 248 298" stroke="#5ec4d6" stroke-width="5"/>
+          <path d="M470 600C500 540 540 470 560 420S590 350 598 330" stroke="#5ec4d6" stroke-width="7"/>
+          <path d="M120 470C170 440 200 420 240 380" stroke="#5ec4d6" stroke-width="4"/>
+        </g>
+        <g class="etq-rio" fill="#bdeaf2" font-family="Inter" font-size="15" font-style="italic">
+          <text x="610" y="378" transform="rotate(-3 610 378)">Río Madre de Dios</text>
+          <text x="150" y="540" transform="rotate(-48 150 540)">Río Inambari</text>
+          <text x="510" y="560" transform="rotate(-62 510 560)">Río Tambopata</text>
+        </g>
+        <g class="puntos" font-family="Inter" font-size="16" font-weight="600">
+          <g class="p-mina"><circle cx="255" cy="330" r="9"/><text x="160" y="320">Huepetuhe</text></g>
+          <g class="p-mina"><circle cx="300" cy="430" r="9"/><text x="208" y="460">La Pampa</text></g>
+          <g class="p-mina"><circle cx="420" cy="345" r="9"/><text x="380" y="380">Laberinto</text></g>
+          <g class="p-mina"><circle cx="232" cy="296" r="7"/><text x="232" y="275">Boca Colorado</text></g>
+          <g class="p-ciudad"><circle cx="598" cy="332" r="11"/><text x="540" y="300">Puerto Maldonado</text></g>
+          <g class="p-comunidad"><circle cx="70" cy="218" r="8"/><text x="40" y="188">Shintuya</text></g>
+        </g>
+        <g class="leyenda" font-family="Inter" font-size="14" fill="#d6e6e2">
+          <rect x="24" y="560" width="270" height="62" rx="12" fill="#0b2236" opacity=".85"/>
+          <circle cx="46" cy="580" r="7" fill="#f28c28"/><text x="60" y="585">Zona minera</text>
+          <circle cx="160" cy="580" r="7" fill="#ffffff"/><text x="174" y="585">Ciudad</text>
+          <circle cx="46" cy="604" r="7" fill="#7ee0a3"/><text x="60" y="609">Comunidad indígena</text>
+        </g>
+        <text x="736" y="626" text-anchor="end" font-family="Inter" font-size="12" fill="#8fb3aa">Esquema referencial, no a escala</text>
+      </svg>
+    </div>
+    <div class="problema-datos">
+      <p class="sobretitulo anim" data-d="0">El problema</p>
+      <h2 class="anim" data-d="1">El mercurio va donde va el río… y nadie lo ve llegar</h2>
+      <div class="kpis kpis3">
+        <article class="kpi anim" data-d="2"><span class="kpi-num"><span class="contar" data-valor="3000" data-miles="1">3 000</span> t</span><p>de mercurio vertidas en ríos del Perú en 20 años <small>(MINAM, 2025)</small></p></article>
+        <article class="kpi anim" data-d="3"><span class="kpi-num"><span class="contar" data-valor="29">29</span>%</span><p>de gestantes evaluadas en Madre de Dios sobre el límite en sangre <small>(Duke, 2023)</small></p></article>
+        <article class="kpi anim" data-d="4"><span class="kpi-num">1 <small>de</small> 3</span><p>niños de la Reserva Amarakaeri sobre el límite de la OMS <small>(Mongabay, 2026)</small></p></article>
+      </div>
+      <article class="vacio anim" data-d="5">
+        <h3>¿Por qué falla hoy? Se mide a mano, pocas veces al año</h3>
+        <div class="linea-tiempo" aria-hidden="true">
+          <svg viewBox="0 0 520 110">
+            <path d="M10 84 L60 80 L90 82 L120 36 L140 26 L160 76 L220 82 L300 80 L330 20 L350 14 L370 78 L510 82" fill="none" stroke="#5ec4d6" stroke-width="4" stroke-linejoin="round"/>
+            <line x1="10" y1="56" x2="510" y2="56" stroke="#f87171" stroke-width="2" stroke-dasharray="6 6"/>
+            <text x="512" y="50" fill="#f87171" font-size="13" font-family="Inter" text-anchor="end">límite</text>
+            <g fill="#ffffff"><circle cx="60" cy="80" r="7"/><circle cx="220" cy="82" r="7"/><circle cx="440" cy="81" r="7"/></g>
+            <text x="250" y="106" fill="#c7d6d9" font-size="13" font-family="Inter" text-anchor="middle">● muestreo manual: los picos pasan sin que nadie los vea</text>
+          </svg>
+        </div>
+        <p>En 2025 las muestras de la Contraloría en la quebrada Guacamayo salieron <strong>normales</strong>; otra medición de la ANA (2021–2025) halló mercurio <strong>sobre el estándar</strong>.</p>
+      </article>
+    </div>
+  </div>
+  <aside class="notas">
+    <p><b>[Erick] · 0:20–0:55 · señalar el mapa y luego la línea</b></p>
+    <p>No es un caso aislado. En 20 años se vertieron 3000 toneladas de mercurio en los ríos del Perú. En Madre de Dios, el 29 % de las gestantes evaluadas y uno de cada tres niños de Amarakaeri superan el límite.</p>
+    <p>¿Y por qué nadie lo ve venir? Porque hoy el agua se mide a mano, pocas veces al año. Una auditoría de 2025 dio normal donde otra medición sí halló mercurio. Los picos pasan sin que nadie los vea.</p>
+  </aside>
+</section>
+
+<!-- 3 · SOLUCIÓN -->
+<section class="slide claro solucion s3" data-titulo="La solución">
+  <div class="cabecera">
+    <p class="sobretitulo anim" data-d="0">Nuestra solución</p>
+    <h2 class="anim" data-d="1">Un vigilante que flota en el río y <span class="resaltado">avisa en minutos</span></h2>
+  </div>
+  <div class="s3-grid">
+    <figure class="nodo-foto anim" data-d="1">
+      <img src="assets/nodo_exterior.jpg" alt="Nodo flotante AmazonMercury en el río, con panel solar redondo y cúpula">
+      <figcaption>Nodo AmazonMercury · maqueta 3D</figcaption>
+    </figure>
+    <ol class="pasos-sol">
+      <li class="anim" data-d="2"><span class="n">1</span><div><strong>Mide cada hora</strong><p>Toma una muestra y la analiza con <b>voltametría</b>: mercurio y otros 5 metales, por debajo de los límites de la OMS.</p></div></li>
+      <li class="anim" data-d="3"><span class="n">2</span><div><strong>Más datos del agua</strong><p>Turbidez, pH, conductividad y temperatura. Si la turbidez se dispara, hay una draga río arriba.</p></div></li>
+      <li class="anim" data-d="4"><span class="n">3</span><div><strong>Transmite sin señal celular</strong><p>Radio LoRa de nodo en nodo. Funciona solo con el sol: panel de 3 W y 2 baterías.</p></div></li>
+      <li class="anim" data-d="5"><span class="n">4</span><div><strong>Alerta en dos paneles</strong><p>Uno profesional para quien paga y <b>Mi Río</b> para la comunidad, al mismo tiempo.</p></div></li>
+    </ol>
+    <div class="s3-lado anim" data-d="6">
+      <div class="chips-metal mini-metales"><span>Hg</span><span>As</span><span>Pb</span><span>Cd</span><span>Cu</span><span>Zn</span></div>
+      <p class="s3-dato"><b>0,07–0,4 µg/L</b> límite de detección de la voltametría con electrodo de oro <small>(INIS-OIEA)</small></p>
+      <p class="s3-dato"><b>6 µg/L</b> valor guía de la OMS para mercurio en agua de consumo</p>
+      <button class="btn-vivo grande" data-abrir-demo="demo">▶ Ver la demo en vivo</button>
+      <p class="s3-nota">Maqueta 3D + panel profesional + Mi Río, conectados</p>
+    </div>
+  </div>
+  <aside class="notas">
+    <p><b>[Jhan] · 0:55–1:30</b></p>
+    <p>Por eso creamos AmazonMercury: un nodo que flota y mide el río cada hora. Con voltametría detecta mercurio y otros cinco metales por debajo de los límites de la OMS.</p>
+    <p>Envía el dato por radio LoRa, sin señal de celular, y funciona solo con energía solar. El resultado llega en minutos a dos paneles: uno profesional y otro para la comunidad.</p>
+    <p>(Si hay tiempo e internet: pulsar «Ver la demo en vivo». Si no, seguir.)</p>
+  </aside>
+</section>
+
+<!-- 4 · DIFERENCIACIÓN -->
+<section class="slide oscuro dif" data-titulo="Diferenciación">
+  <div class="cabecera">
+    <p class="sobretitulo anim" data-d="0">Alternativas que existen hoy</p>
+    <h2 class="anim" data-d="1">No somos los únicos. Somos los únicos que hacen <em>esto</em>.</h2>
+  </div>
+  <div class="tabla-dif anim" data-d="2" role="table" aria-label="Comparación con alternativas">
+    <div class="td-fila td-cab" role="row">
+      <span role="columnheader"></span>
+      <span role="columnheader">Muestreo manual + laboratorio</span>
+      <span role="columnheader">Sondas multiparámetro comerciales</span>
+      <span role="columnheader">GalamSense (Ghana)</span>
+      <span role="columnheader" class="nosotros"><img src="assets/logo-icono.png" alt="">AmazonMercury</span>
+    </div>
+    <div class="td-fila" role="row"><span role="rowheader">¿Cada cuánto mide?</span><span class="mal">Pocas veces al año</span><span class="bien">Continuo</span><span class="bien">Continuo</span><span class="nosotros bien">Cada hora + emergencias</span></div>
+    <div class="td-fila" role="row"><span role="rowheader">¿Mide mercurio en el río?</span><span class="medio">Sí, semanas después en laboratorio</span><span class="mal">Normalmente no</span><span class="bien">Sí (Hg, Pb, As)</span><span class="nosotros bien">Sí: 6 metales + 4 parámetros</span></div>
+    <div class="td-fila" role="row"><span role="rowheader">¿Avisa a la comunidad?</span><span class="mal">No</span><span class="mal">Solo al dueño</span><span class="bien">Sí</span><span class="nosotros bien">Sí: Mi Río, SMS y radio</span></div>
+    <div class="td-fila" role="row"><span role="rowheader">¿Quién lo cuida?</span><span class="medio">Consultora externa</span><span class="medio">El cliente</span><span class="medio">Universidad</span><span class="nosotros bien">Guardianes del Río locales</span></div>
+    <div class="td-fila" role="row"><span role="rowheader">¿Está en el Perú?</span><span class="bien">Sí</span><span class="medio">Importadas</span><span class="mal">No (demostración)</span><span class="nosotros bien">Hecho en Arequipa para la Amazonía</span></div>
+  </div>
+  <p class="dif-conclusion anim" data-d="4">GalamSense demuestra que la tecnología funciona. Nuestra ventaja es el <strong>servicio completo y local</strong>: medición + alerta a la comunidad + personas del lugar que lo mantienen.</p>
+  <p class="fuentes">Fuentes: GalamSense, KNUST (2026) · Protocolo nacional de monitoreo de calidad de agua, ANA · Instrumentos de gestión ambiental minera (D.S. 040-2014-EM).</p>
+  <aside class="notas">
+    <p><b>[Jhan] · 1:30–1:55</b></p>
+    <p>Hoy hay tres alternativas. El muestreo manual da resultados semanas después. Las sondas comerciales normalmente no miden mercurio en el río. Y en Ghana, GalamSense demuestra que la tecnología funciona, pero sigue en demostración.</p>
+    <p>Nosotros damos un servicio completo: medición cada hora, alerta a la comunidad y Guardianes del Río locales que cuidan cada nodo.</p>
+  </aside>
+</section>
+
+<!-- 5 · CLIENTE VS BENEFICIARIO -->
+<section class="slide claro cvb" data-titulo="Quién paga y quién se beneficia">
+  <div class="cabecera">
+    <p class="sobretitulo anim" data-d="0">Modelo de negocio · 1</p>
+    <h2 class="anim" data-d="1">La minería paga. <span class="resaltado">La comunidad recibe las alertas.</span></h2>
+  </div>
+  <div class="cvb-grid">
+    <figure class="navegador anim" data-d="2">
+      <div class="nav-barra"><i></i><i></i><i></i><span>Panel profesional</span></div>
+      <img src="assets/panel_pro.jpg" alt="Panel profesional de AmazonMercury con un diagnóstico de emergencia en alerta">
+      <figcaption><b>Cliente que paga</b> · minería formal y Estado: datos técnicos, historial, reportes y diagnóstico de emergencia</figcaption>
+    </figure>
+    <div class="cvb-centro">
+      <div class="cvb-flecha anim" data-d="3"><span>Mismo dato,<br>al mismo tiempo</span></div>
+      <article class="cvb-card anim" data-d="4"><b>💼 Pagan</b><p>Minería formal (principal) y sector público (secundario)</p></article>
+      <article class="cvb-card anim" data-d="5"><b>🏡 Reciben gratis</b><p>Comunidades río abajo: familias, pescadores, escuelas y postas</p></article>
+      <article class="cvb-card naranja anim" data-d="6"><b>🔒 Regla de confianza</b><p>El cliente <strong>no puede editar ni ocultar</strong> los datos</p></article>
+      <article class="cvb-card verde anim" data-d="7"><b>5 → 1</b><p>Por cada 5 nodos vendidos financiamos <strong>1 nodo comunitario</strong></p></article>
+    </div>
+    <figure class="telefono anim" data-d="3">
+      <div class="tel-marco"><img src="assets/mirio_alerta.png" alt="Panel comunitario Mi Río mostrando una alerta en Laberinto"></div>
+      <figcaption><b>Beneficiario</b> · Mi Río: semáforo simple, consejos y botón «Escuchar»</figcaption>
+    </figure>
+  </div>
+  <aside class="notas">
+    <p><b>[Erick] · 1:55–2:20</b></p>
+    <p>Nuestro modelo separa a quien paga de quien se beneficia. Pagan la minería formal y el Estado, que ven el panel profesional. La comunidad recibe gratis Mi Río: un semáforo simple que le dice si puede usar el agua hoy.</p>
+    <p>El mismo dato llega a los dos al mismo tiempo, y el cliente no puede editarlo. Y por cada cinco nodos vendidos, financiamos uno comunitario.</p>
+  </aside>
+</section>
+
+<!-- 6 · POR QUÉ LA MINERÍA -->
+<section class="slide oscuro porque" data-titulo="¿Por qué pagaría una minera?">
+  <div class="cabecera">
+    <p class="sobretitulo anim" data-d="0">Modelo de negocio · 2</p>
+    <h2 class="anim" data-d="1">¿Por qué pagaría una minera?</h2>
+  </div>
+  <div class="razones">
+    <article class="razon anim" data-d="2"><span class="r-num">IGA</span><h3>Ya está obligada</h3><p>Debe entregar informes de monitoreo de agua a la autoridad, con la frecuencia que fija su instrumento ambiental. <b>Ya tiene presupuesto.</b></p></article>
+    <article class="razon anim" data-d="3"><span class="r-num"><span class="contar" data-valor="96">96</span></span><h3>Conflictos activos</h3><p>conflictos socioambientales vinculados a actividades extractivas (junio de 2026). El agua está detrás de la mayoría.</p></article>
+    <article class="razon anim" data-d="4"><span class="r-num">S/ 110<small>M</small></span><h3>Multas del OEFA</h3><p>impuestas en solo 100 días. Detectar una fuga a tiempo cuesta menos que una multa.</p></article>
+    <article class="razon anim" data-d="5"><span class="r-num">~<span class="contar" data-valor="30">30</span></span><h3>Ya lo hacen con la comunidad</h3><p>empresas mineras trabajan con comités de monitoreo participativo. Nosotros lo hacemos <b>continuo y creíble</b>.</p></article>
+  </div>
+  <div class="porque-pie anim" data-d="6">
+    <p><b>¿No es contradictorio?</b> El mercurio de Madre de Dios viene de la minería <b>ilegal</b>. La formal necesita demostrar que no contamina, con datos que la comunidad crea.</p>
+    <p><b>Segundo cliente:</b> gobiernos regionales y empresas de agua potable, también vía <b>Obras por Impuestos</b>.</p>
+  </div>
+  <p class="fuentes">Fuentes: OEFA, procedimiento de informes de monitoreo (D.S. 040-2014-EM) · Defensoría del Pueblo, jun. 2026 (vía Infobae) · OEFA, 100 días de gestión (nov. 2026) · Comités de Monitoreo y Vigilancia Ambiental Participativa (PNUD).</p>
+  <aside class="notas">
+    <p><b>[Erick] · 2:20–2:40</b></p>
+    <p>¿Por qué pagaría una minera? Porque ya está obligada a monitorear el agua; porque el agua está detrás de los 96 conflictos socioambientales activos; porque el OEFA impuso 110 millones en multas en cien días; y porque unas 30 empresas ya trabajan con comités de monitoreo con la comunidad.</p>
+    <p>Nosotros lo hacemos continuo y creíble.</p>
+  </aside>
+</section>
+
+<!-- 7 · INGRESOS Y UNIT ECONOMICS -->
+<section class="slide claro ue" data-titulo="Ingresos y números por nodo">
+  <div class="cabecera">
+    <p class="sobretitulo anim" data-d="0">Modelo de negocio · 3</p>
+    <h2 class="anim" data-d="1">Monitoreo como servicio: <span class="resaltado">todo incluido, pago mensual</span></h2>
+  </div>
+  <div class="ue-grid">
+    <div class="precios anim" data-d="2">
+      <h3>Lo que cobramos</h3>
+      <div class="precio principal"><span>Minería formal</span><b>S/ 1 800</b><small>por nodo al mes</small></div>
+      <div class="precio"><span>Sector público</span><b>S/ 1 200</b><small>por nodo al mes</small></div>
+      <div class="precio"><span>Instalación</span><b>S/ 1 500</b><small>pago único por nodo</small></div>
+      <p class="incluye">Incluye: equipo en comodato, Guardián del Río, electrodos y reactivo, plataforma, alertas y reporte mensual.</p>
+    </div>
+    <div class="desglose anim" data-d="3">
+      <h3>De cada S/ 1 800 al mes</h3>
+      <div class="barra-apilada" role="img" aria-label="Desglose del precio de un nodo">
+        <span style="--w:19.4;--c:#16324f">Guardián<br>350</span>
+        <span style="--w:11.1;--c:#1f7a8c">Labo&shy;ratorio<br>200</span>
+        <span style="--w:4.5;--c:#5ec4d6"></span>
+        <span style="--w:2.8;--c:#9bd6e1"></span>
+        <span style="--w:4.9;--c:#8aa4b5"></span>
+        <span style="--w:57.3;--c:#2f8a57" class="margen">Margen bruto<br><b>S/ 1 031 · 57 %</b></span>
+      </div>
+      <ul class="leyenda-ue">
+        <li><i style="--c:#16324f"></i>Guardián del Río (S/ 1 600 de sueldo, 30 % más que el mínimo, a cargo de 6 nodos)</li>
+        <li><i style="--c:#1f7a8c"></i>Validación mensual con laboratorio acreditado</li>
+        <li><i style="--c:#5ec4d6"></i>Electrodos y reactivo (S/ 81)</li>
+        <li><i style="--c:#9bd6e1"></i>Plataforma, SMS y repuestos (S/ 50)</li>
+        <li><i style="--c:#8aa4b5"></i>Equipo (≈ S/ 3 150 en 3 años = S/ 88)</li>
+      </ul>
+    </div>
+    <div class="ue-kpis">
+      <article class="ue-kpi anim" data-d="4"><span>LTV / CAC</span><b>≈ 9×</b><small>LTV ≈ S/ 74 000 (3 nodos × 24 meses) · CAC ≈ S/ 8 000 (piloto + visitas)</small></article>
+      <article class="ue-kpi anim" data-d="5"><span>Punto de equilibrio</span><b>9 nodos</b><small>8 pagados + 1 comunitario ≈ 3 clientes · mes 15–18</small></article>
+      <article class="ue-kpi anim" data-d="6"><span>Margen bruto</span><b>57 %</b><small>sector público: 36 %</small></article>
+    </div>
+  </div>
+  <div class="supuestos anim" data-d="7">
+    <b>Supuestos que validaremos primero:</b>
+    <span>precio con 3–5 mineras</span><span>1 Guardián cada 6 nodos</span><span>electrodo cada 3 semanas</span><span>contratos de 24 meses</span>
+  </div>
+  <p class="fuentes">Cifras estimadas por el equipo, por validar con clientes. Sueldo mínimo vigente: S/ 1 230 (D.S. 015-2026-TR). Gastos fijos del equipo: ≈ S/ 7 000 al mes.</p>
+  <aside class="notas">
+    <p><b>[Erick] · 2:40–3:10 · señalar la barra</b></p>
+    <p>Cobramos 1800 soles por nodo al mes a la minería y 1200 al sector público, todo incluido. Nos cuesta 769; lo principal es el Guardián del Río, un poblador capacitado al que pagamos 30 % más que el sueldo mínimo. Nos queda un margen de 57 %.</p>
+    <p>Cada cliente nos cuesta unos 8000 soles y nos deja nueve veces más en dos años. Llegamos al equilibrio con nueve nodos, unos tres clientes, entre el mes 15 y el 18.</p>
+  </aside>
+</section>
+
+<!-- 8 · MERCADO Y ESCALA -->
+<section class="slide oscuro mercado" data-titulo="Mercado y crecimiento">
+  <div class="cabecera">
+    <p class="sobretitulo anim" data-d="0">Modelo de negocio · 4</p>
+    <h2 class="anim" data-d="1">Un mercado grande, una meta realista</h2>
+  </div>
+  <div class="mercado-grid">
+    <div class="circulos anim" data-d="2" role="img" aria-label="TAM, SAM y SOM">
+      <div class="c-tam"><span>TAM</span><b>S/ 46 M<small>/año</small></b><p>715 unidades mineras en explotación × 3 nodos</p></div>
+      <div class="c-sam"><span>SAM</span><b>S/ 9 M<small>/año</small></b><p>Sur del país con relaves o ríos cerca (hipótesis 20 %)</p></div>
+      <div class="c-som"><span>SOM · 24 meses</span><b>S/ 324 mil<small>/año</small></b><p>5 clientes · 15 nodos</p></div>
+    </div>
+    <ol class="fases">
+      <li class="anim" data-d="3"><span class="fase">Año 1</span><div><h3>Piloto en Madre de Dios + primer cliente minero del sur</h3><p>Validación con laboratorio y Guardianes capacitados.</p></div></li>
+      <li class="anim" data-d="4"><span class="fase">Año 2</span><div><h3>5 clientes y agua potable</h3><p>Empresas de agua y gobiernos regionales, vía Obras por Impuestos.</p></div></li>
+      <li class="anim" data-d="5"><span class="fase">Año 3+</span><div><h3>Relaves en los Andes, más ríos, pescado y aire</h3><p>Misma plataforma, nuevos sensores.</p></div></li>
+      <li class="anim" data-d="6"><span class="fase">Después</span><div><h3>Bolivia, Brasil, Colombia, Ghana</h3><p>+ datos e imágenes satelitales de dragas para predecir picos.</p></div></li>
+    </ol>
+  </div>
+  <p class="fuentes">Fuente: MINEM, Boletín Estadístico Minero (feb. 2026): 715 unidades en explotación. TAM = 715 × 3 nodos × S/ 21 600 al año. SAM y SOM: estimaciones del equipo.</p>
+  <aside class="notas">
+    <p><b>[Erick] · 3:10–3:30</b></p>
+    <p>En el Perú hay 715 unidades mineras en explotación: un mercado de unos 46 millones de soles al año. Nuestra meta realista a dos años son 5 clientes y 15 nodos: 324 000 soles al año.</p>
+    <p>Empezamos por Madre de Dios y el sur, y luego crecemos a otros ríos y países.</p>
+  </aside>
+</section>
+
+<!-- 9 · IMPACTO -->
+<section class="slide claro impacto" data-titulo="Impacto medible">
+  <div class="cabecera">
+    <p class="sobretitulo anim" data-d="0">Impacto</p>
+    <h2 class="anim" data-d="1">Más ventas = <span class="resaltado">más ríos vigilados</span></h2>
+  </div>
+  <div class="cambio anim" data-d="2">
+    <div><b>Medimos cada hora</b><span>de pocas muestras al año a 8 760 por nodo</span></div>
+    <i>→</i>
+    <div><b>Alertamos en minutos</b><span>a la comunidad y a la autoridad</span></div>
+    <i>→</i>
+    <div><b>Menos exposición</b><span>y evidencia para fiscalizar</span></div>
+  </div>
+  <div class="impacto-grid">
+    <article class="ind anim" data-d="3"><b><span class="contar" data-valor="157680" data-miles="1">157 680</span></b><p>mediciones al año con 18 nodos (meta a 24 meses)</p></article>
+    <article class="ind anim" data-d="4"><b>3</b><p>nodos comunitarios gratuitos (1 por cada 5 vendidos)</p></article>
+    <article class="ind anim" data-d="5"><b>3</b><p>empleos formales de Guardianes del Río, con capacitación</p></article>
+    <article class="ind anim" data-d="6"><b>&lt; 15 <small>min</small></b><p>desde la medición hasta la alerta en Mi Río</p></article>
+    <div class="ods-mini anim" data-d="7">
+      <span style="--ods:#26bde2"><b>6</b>Agua limpia · meta 6.3</span>
+      <span style="--ods:#4c9f38"><b>3</b>Salud · meta 3.9</span>
+    </div>
+  </div>
+  <div class="impacto-pie">
+    <article class="anim" data-d="8">
+      <h3>¿Cómo lo verificamos?</h3>
+      <p>Cada medición, alerta y tiempo de respuesta queda registrado en la plataforma. Un laboratorio acreditado por INACAL valida los datos cada mes, y publicamos un reporte abierto para la comunidad.</p>
+    </article>
+    <article class="anim alineado" data-d="9">
+      <h3>El negocio y la misión van juntos</h3>
+      <div class="formula"><span><b>5</b> nodos vendidos</span><i>=</i><span><b>1</b> nodo comunitario gratis</span><i>+</i><span><b>1</b> empleo local por cada 6 nodos</span></div>
+    </article>
+  </div>
+  <aside class="notas">
+    <p><b>[Jhan] · 3:30–3:55</b></p>
+    <p>El impacto crece con las ventas. Pasamos de unas pocas muestras al año a una cada hora, con alertas en minutos.</p>
+    <p>A dos años: más de 150 000 mediciones al año, tres nodos comunitarios gratuitos y tres empleos formales de Guardianes del Río. Aportamos a los ODS 6 y 3.</p>
+  </aside>
+</section>
+
+<!-- 10 · TRACCIÓN Y EQUIPO -->
+<section class="slide oscuro equipo-s" data-titulo="Tracción y equipo">
+  <div class="cabecera">
+    <p class="sobretitulo anim" data-d="0">Tracción y equipo</p>
+    <h2 class="anim" data-d="1">Lo que ya construimos y quién lo ejecuta</h2>
+  </div>
+  <div class="eq-grid">
+    <div class="eq-izq">
+      <article class="eq-caja anim" data-d="2">
+        <h3>Ya tenemos</h3>
+        <ul class="checks">
+          <li>Nodo en 3D interactivo con ciclo de medición simulado</li>
+          <li>Panel profesional y Mi Río conectados en tiempo real</li>
+          <li>Diseño técnico basado en más de 30 fuentes oficiales</li>
+          <li>Testimonio de un poblador de Puerto Maldonado</li>
+        </ul>
+        <div class="qrs">
+          <figure><img src="assets/qr-maqueta.svg" alt="QR de la maqueta 3D"><figcaption>Maqueta 3D</figcaption></figure>
+          <figure><img src="assets/qr-mirio.svg" alt="QR de Mi Río"><figcaption>Mi Río</figcaption></figure>
+        </div>
+      </article>
+      <article class="eq-caja anim" data-d="3">
+        <h3>Próximos 15 meses</h3>
+        <ol class="hitos">
+          <li><b>Mes 4</b>Prototipo real validado con laboratorio acreditado</li>
+          <li><b>Mes 9</b>Piloto de 2 nodos en Madre de Dios con Guardianes</li>
+          <li><b>Mes 15</b>Primer cliente minero que paga (3 nodos)</li>
+        </ol>
+        <p class="riesgos"><b>Riesgos:</b> precisión → validación mensual · robo → custodia comunitaria · costo del potenciostato → diseño propio a escala</p>
+      </article>
+    </div>
+    <div class="eq-der">
+      <article class="persona anim" data-d="4">
+        <span class="rol">CEO · Producto y datos</span>
+        <h3>Erick Elias Cardeña Maque</h3>
+        <p>Ingeniería de Sistemas, UCSM. Construyó la maqueta 3D y los paneles. Lidera ventas, alianzas y finanzas.</p>
+      </article>
+      <article class="persona anim" data-d="5">
+        <span class="rol">CTO · Hardware y operación en campo</span>
+        <h3>Jhan David Cutipa Poma</h3>
+        <p>Ingeniería Mecatrónica, UCSM. Diseña el nodo, los sensores y la energía. Lidera la fabricación y a los Guardianes del Río.</p>
+      </article>
+      <article class="apoyo anim" data-d="6">
+        <h3>Red de apoyo que buscamos</h3>
+        <ul><li>Asesor en química analítica (UCSM)</li><li>Mentoría de negocio · Incubadora Scale</li><li>Aliado amazónico · CINCIA o FENAMAD</li></ul>
+      </article>
+    </div>
+  </div>
+  <aside class="notas">
+    <p><b>[Jhan, luego Erick] · 3:55–4:20</b></p>
+    <p>[Jhan] Ya construimos el nodo en 3D y los dos paneles, conectados en tiempo real: pueden probarlos con estos códigos. En 4 meses tendremos el prototipo real validado con laboratorio; a los 9, un piloto en Madre de Dios; y al mes 15, nuestro primer cliente minero. Yo soy Jhan David, de Mecatrónica, el CTO: llevo el hardware y la operación en campo.</p>
+    <p>[Erick] Y yo soy Erick, de Ingeniería de Sistemas, el CEO: llevo el producto, las ventas y las alianzas.</p>
+  </aside>
+</section>
+
+<!-- 11 · ASK Y CIERRE -->
+<section class="slide oscuro cierre ask" data-titulo="Lo que pedimos y cierre" data-arte="cierre">
+  <svg class="arte-cierre" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <div class="ask-texto">
+    <p class="sobretitulo anim" data-d="0">Lo que pedimos</p>
+    <h2 class="anim" data-d="1">S/ 10 000 de capital semilla</h2>
+    <div class="ask-barra anim" data-d="2">
+      <span style="--w:63;--c:#2f8a57"><b>63 %</b> 2 nodos reales</span>
+      <span style="--w:25;--c:#1f7a8c"><b>25 %</b> Laboratorio</span>
+      <span style="--w:12;--c:#f28c28"><b>12 %</b></span>
+    </div>
+    <p class="ask-leyenda anim" data-d="2"><i style="--c:#2f8a57"></i>S/ 6 300 construir 2 nodos <i style="--c:#1f7a8c"></i>S/ 2 500 validación con laboratorio <i style="--c:#f28c28"></i>S/ 1 200 logística del piloto</p>
+    <p class="ask-meta anim" data-d="3">En 9 meses: <strong>dos nodos validados vigilando el río en Madre de Dios</strong> y la primera conversación formal con un cliente minero.</p>
+    <h2 class="cierre-frase anim" data-d="4">El mercurio no se ve, no se huele y no avisa.</h2>
+    <p class="cierre-golpe anim" data-d="5">Nosotros sí.</p>
+    <div class="cierre-pie anim" data-d="6">
+      <img class="cierre-logo" src="assets/logo-blanco.png" alt="AmazonMercury">
+      <div class="cierre-info">
+        <p class="gracias">¡Gracias!</p>
+        <p>Equipo EcoRaiz · UCSM · Incubadora Scale</p>
+        <p class="url">erick-ucsm.github.io/AmazonMercury</p>
+      </div>
+      <img class="cierre-qr" src="assets/qr-mirio.svg" alt="QR de Mi Río">
+    </div>
+  </div>
+  <aside class="notas">
+    <p><b>[Erick] · 4:20–4:30 · más lento al final</b></p>
+    <p>Pedimos 10 000 soles de capital semilla: 63 % para construir dos nodos reales, 25 % para validarlos con laboratorio y 12 % para el piloto. Con eso, en nueve meses, el río de Madre de Dios tendrá sus primeros vigilantes.</p>
+    <p>El mercurio no se ve, no se huele y no avisa. (Pausa) Nosotros sí. Gracias.</p>
+  </aside>
+</section>
+
+<!-- ANEXO A · COSTOS -->
+<section class="slide claro anexo an-costos" data-titulo="Anexo A · Costos por nodo">
+  <div class="cabecera">
+    <p class="sobretitulo">Anexo A · Para preguntas del jurado</p>
+    <h2>¿De dónde salen los números?</h2>
+  </div>
+  <div class="anexo-grid">
+    <table class="tabla-an">
+      <caption>Costo de fabricar un nodo (CAPEX)</caption>
+      <tbody>
+        <tr><td>Potenciostato (EmStat Pico, referencia)</td><td>≈ S/ 1 700</td></tr>
+        <tr><td>Electrodos de oro y bismuto (juego inicial)</td><td>≈ S/ 45</td></tr>
+        <tr><td>Sondas de pH, conductividad, turbidez y temperatura</td><td>≈ S/ 560</td></tr>
+        <tr><td>Casco, cúpula, panel 3 W, 2 baterías, ESP32, LoRa, microbomba, cartucho</td><td>≈ S/ 700</td></tr>
+        <tr><td>Parte de la puerta de enlace (1 cada 10 nodos)</td><td>≈ S/ 150</td></tr>
+        <tr class="total"><td>Total por nodo</td><td>≈ S/ 3 150</td></tr>
+      </tbody>
+    </table>
+    <table class="tabla-an">
+      <caption>Costo de operar un nodo al mes (OPEX)</caption>
+      <tbody>
+        <tr><td>Guardián del Río: S/ 1 600 + beneficios ≈ S/ 2 100, a cargo de 6 nodos</td><td>S/ 350</td></tr>
+        <tr><td>Validación con laboratorio acreditado</td><td>S/ 200</td></tr>
+        <tr><td>Electrodos (cambio cada 2–4 semanas)</td><td>S/ 56</td></tr>
+        <tr><td>Reactivo (~1 mL por medición)</td><td>S/ 25</td></tr>
+        <tr><td>Plataforma, SMS y repuestos</td><td>S/ 50</td></tr>
+        <tr><td>Equipo amortizado en 36 meses</td><td>S/ 88</td></tr>
+        <tr class="total"><td>Total por nodo al mes</td><td>S/ 769</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="nota-an">Potenciostato: US$ 499 en Digi-Key; a gran escala existe la versión en chip (EmStat Pico Core), que bajará el costo. Tipo de cambio ≈ S/ 3,40. Precios de electrodos por cotizar con el distribuidor.</p>
+  <aside class="notas"><p>Diapositiva de respaldo. Usar solo si el jurado pregunta por costos o márgenes.</p></aside>
+</section>
+
+<!-- ANEXO B · TECNOLOGÍA -->
+<section class="slide claro anexo an-tec" data-titulo="Anexo B · Tecnología y energía">
+  <div class="cabecera">
+    <p class="sobretitulo">Anexo B · Para preguntas del jurado</p>
+    <h2>¿Funciona de verdad en el río?</h2>
+  </div>
+  <div class="anexo-grid tres">
+    <article class="an-caja">
+      <h3>Precisión</h3>
+      <ul>
+        <li>Voltametría con electrodo de oro: límites de <b>0,07–0,4 µg/L</b> (INIS-OIEA).</li>
+        <li>El Hg-ISE del prototipo inicial detecta desde ~8 µg/L: <b>no alcanza</b> el valor guía de 6 µg/L. Por eso cambiamos.</li>
+        <li>Mide el metal <b>disuelto</b>; cada mes validamos con laboratorio el mercurio total.</li>
+      </ul>
+    </article>
+    <article class="an-caja">
+      <h3>Energía (1 medición por hora)</h3>
+      <ul>
+        <li>Consumo ≈ <b>473 mAh/día</b>.</li>
+        <li>Sin sol: ≈ <b>10 días</b> con 2 baterías 18650.</li>
+        <li>Con panel de 3 W: autosuficiente todo el año, incluso en época de lluvias.</li>
+        <li>Cada 30 min: 4 baterías + panel de 4 W.</li>
+      </ul>
+    </article>
+    <article class="an-caja">
+      <h3>Mantenimiento</h3>
+      <ul>
+        <li>Guardián: limpieza diaria de rejilla, cúpula y sondas.</li>
+        <li>Electrodos: cambio cada 2–4 semanas.</li>
+        <li>Reactivo: cada ~6 semanas (1 L).</li>
+        <li>Batería: cada 2–3 años · Nodo: 5 años o más.</li>
+      </ul>
+    </article>
+  </div>
+  <p class="nota-an">Consumos y vidas útiles: estimaciones de diseño a partir de valores típicos de los componentes; se medirán en el prototipo real.</p>
+  <aside class="notas"><p>Diapositiva de respaldo. Usar si preguntan por la precisión del sensor, la batería o el mantenimiento.</p></aside>
+</section>
+
+<!-- ANEXO C · PREGUNTAS DIFÍCILES -->
+<section class="slide oscuro anexo an-preg" data-titulo="Anexo C · Preguntas difíciles">
+  <div class="cabecera">
+    <p class="sobretitulo">Anexo C · Para preguntas del jurado</p>
+    <h2>Preguntas difíciles</h2>
+  </div>
+  <div class="preguntas">
+    <article><h3>¿No es contradictorio cobrarle a la minería?</h3><p>El mercurio de Madre de Dios viene de la minería ilegal. La formal necesita demostrar que no contamina, con datos que la comunidad crea; por eso el cliente no puede editar ni ocultar los datos.</p></article>
+    <article><h3>¿Y si una empresa grande copia la idea?</h3><p>Lo difícil no es el sensor: es la red de Guardianes del Río, la confianza de las comunidades y los datos históricos de cada río. Eso no se copia rápido.</p></article>
+    <article><h3>¿Cómo miden el impacto y quién lo verifica?</h3><p>Mediciones, alertas y tiempo de respuesta quedan registrados en la plataforma; la validación mensual la hace un laboratorio acreditado por INACAL.</p></article>
+    <article><h3>¿Por qué no venderle solo al Estado?</h3><p>Compra lento y por presupuesto anual. Es nuestro segundo segmento (S/ 1 200 por nodo), y una minera puede financiarlo vía Obras por Impuestos.</p></article>
+    <article><h3>¿Cuál es el mayor riesgo?</h3><p>La precisión en campo. Lo gestionaremos con validación mensual de laboratorio y repitiendo la medición antes de cada alerta pública.</p></article>
+    <article><h3>¿Para qué es exactamente el dinero?</h3><p>S/ 6 300 para 2 nodos reales, S/ 2 500 para análisis de laboratorio y S/ 1 200 para logística del piloto en Madre de Dios.</p></article>
+  </div>
+  <aside class="notas"><p>Diapositiva de respaldo. Respuestas cortas para la ronda de preguntas.</p></aside>
+</section>
+
+</main>
+</div>
+
+<div class="hud-nav" aria-label="Navegación">
+  <button id="btnAnt" aria-label="Diapositiva anterior">&#8249;</button>
+  <span id="contador">1 / 11</span>
+  <button id="btnSig" aria-label="Diapositiva siguiente">&#8250;</button>
+  <button id="btnDemo" title="Abrir la demo en vivo (D)">Demo</button>
+  <button id="btnNotas" title="Guion (N)">Guion</button>
+  <button id="btnOrador" title="Abrir vista del orador en otra ventana (P)">Orador</button>
+  <button id="btnPantalla" title="Pantalla completa (F)">⛶</button>
+</div>
+<div class="progreso"><span id="barraProgreso"></span></div>
+
+<section id="panelNotas" class="panel-notas" hidden>
+  <header><strong id="pnTitulo"></strong><span id="pnReloj">00:00</span></header>
+  <div id="pnTexto"></div>
+  <footer>Siguiente: <span id="pnSiguiente"></span></footer>
+</section>
+
+<div id="visorDemo" class="visor-maqueta visor-demo" hidden>
+  <div class="vm-barra">
+    <strong>Demo en vivo</strong>
+    <div class="vm-tabs" role="tablist">
+      <button data-modo="demo" class="activo">Demo completa</button>
+      <button data-modo="maqueta">Maqueta 3D</button>
+      <button data-modo="panel">Panel profesional</button>
+      <button data-modo="mirio">Mi Río</button>
+    </div>
+    <button data-cerrar-demo aria-label="Cerrar">&times;</button>
+  </div>
+  <div class="vm-cuerpo modo-demo">
+    <iframe data-marco="panel" title="Panel profesional"></iframe>
+    <iframe data-marco="maqueta" title="Maqueta 3D"></iframe>
+    <iframe data-marco="mirio" title="Mi Río"></iframe>
+  </div>
+</div>
+
+<div id="ayuda" class="ayuda">← → avanzar · F pantalla completa · N guion · P orador · D demo</div>
+
+<script src="script.js"></script>
+</body>
+</html>

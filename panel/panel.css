@@ -74,7 +74,7 @@ h1, h2, h3 { font-family: var(--titulo); margin: 0; letter-spacing: -0.01em; }
 .reloj span { font-family: var(--titulo); font-weight: 700; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
 .reloj small { font-size: 0.68rem; color: #a9c3d3; }
 
-.btn {
+.btn { white-space: nowrap;
   display: inline-flex; align-items: center; gap: 8px;
   padding: 10px 16px; border-radius: 10px; border: 0;
   font-weight: 600; font-size: 0.9rem;
@@ -83,6 +83,15 @@ h1, h2, h3 { font-family: var(--titulo); margin: 0; letter-spacing: -0.01em; }
 .btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .btn:active { transform: translateY(1px); }
 .btn-claro { background: #fff; color: var(--navy); }
+.btn-borde-claro { background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, .35); }
+.btn-borde-claro:hover { background: rgba(255, 255, 255, .1); }
+.reportes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.reporte { display: flex; gap: 12px; padding: 12px 14px; border-radius: 12px; background: #f5f9fa; border: 1px solid #e6eef1; }
+.reporte .ri { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; background: #fff; font-size: 1.3rem; }
+.reporte b { display: block; font-size: .88rem; }
+.reporte p { margin: 3px 0 0; font-size: .84rem; color: var(--texto); }
+.reporte small { display: block; margin-top: 4px; font-size: .74rem; color: var(--suave); }
+.reporte.nuevo { background: #fff3e6; border-color: #f6c99a; animation: resaltar 2.5s ease-out; }
 .btn-claro:hover { background: #e7f6f9; }
 .btn-borde { background: #fff; border: 1px solid var(--borde); color: var(--azul); }
 .btn-borde:hover { border-color: var(--teal); color: var(--teal); }
@@ -277,4 +286,10 @@ td { padding: 10px; border-bottom: 1px solid #edf2f4; font-size: 0.88rem; vertic
 }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
+}
+@media (max-width: 1000px) {
+  .cabecera { flex-wrap: wrap; padding: 10px 16px; }
+  .cab-derecha { flex-wrap: wrap; gap: 8px; }
+  .reloj { display: none; }
+  .marca p { font-size: .74rem; }
 }

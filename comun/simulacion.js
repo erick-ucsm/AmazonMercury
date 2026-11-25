@@ -252,3 +252,54 @@ export function guardarLectura(med) {
     localStorage.setItem(CLAVE_LECTURAS, JSON.stringify(lista.slice(-200)));
   } catch { /* sin almacenamiento */ }
 }
+
+export const TIPOS_REPORTE = [
+  { id: 'color', icono: '🟤', texto: 'El agua tiene otro color' },
+  { id: 'peces', icono: '🐟', texto: 'Peces muertos o raros' },
+  { id: 'draga', icono: '⛴️', texto: 'Hay una draga cerca' },
+  { id: 'olor', icono: '👃', texto: 'Olor extraño' },
+  { id: 'nodo', icono: '🛟', texto: 'El nodo está dañado' },
+  { id: 'otro', icono: '💬', texto: 'Otra cosa' }
+];
+
+export const CLAVE_REPORTES = 'amazonmercury-reportes-v1';
+
+export function reportesSemilla(ahora = Date.now()) {
+  const H = 3600e3;
+  return [
+    { id: 'rep-semilla-1', nodo: 'AM-01', tipo: 'color', texto: 'El río bajó muy marrón desde la mañana.', t: ahora - 31 * H, origen: 'Mi Río', simulado: true },
+    { id: 'rep-semilla-2', nodo: 'AM-04', tipo: 'draga', texto: 'Se escucha una draga trabajando de noche, quebrada arriba.', t: ahora - 3 * 24 * H, origen: 'Guardián del Río', simulado: true },
+    { id: 'rep-semilla-3', nodo: 'AM-02', tipo: 'nodo', texto: 'Rejilla con muchas hojas; se limpió.', t: ahora - 6 * 24 * H, origen: 'Guardián del Río', simulado: true }
+  ];
+}
+
+export function leerReportes() {
+  let propios = [];
+  try {
+    propios = JSON.parse(localStorage.getItem(CLAVE_REPORTES) || '[]');
+    if (!Array.isArray(propios)) propios = [];
+  } catch { propios = []; }
+  return [...propios, ...reportesSemilla()].sort((a, b) => b.t - a.t);
+}
+
+export function guardarReporte(rep) {
+  try {
+    const lista = JSON.parse(localStorage.getItem(CLAVE_REPORTES) || '[]');
+    const nueva = (Array.isArray(lista) ? lista : []).filter((x) => x.id !== rep.id);
+    nueva.push(rep);
+    localStorage.setItem(CLAVE_REPORTES, JSON.stringify(nueva.slice(-100)));
+  } catch { /* sin almacenamiento */ }
+}
+
+export const TEXTO_COMUNIDAD = {
+  normal: { titulo: 'Bien', frase: 'El agua del río está bien hoy', color: '#2f8a57', cara: 'feliz' },
+  nd: { titulo: 'Bien', frase: 'El agua del río está bien hoy', color: '#2f8a57', cara: 'feliz' },
+  precaucion: { titulo: 'Cuidado', frase: 'Hay más mercurio de lo normal', color: '#d99100', cara: 'preocupada' },
+  alerta: { titulo: 'No usar para beber ni cocinar', frase: 'El río tiene mucho mercurio', color: '#d64545', cara: 'alerta' }
+};
+
+export function nivelHg(valor) {
+  if (valor === null || valor === undefined || valor < 2) return { id: 'bajo', texto: 'Bajo', pos: Math.max(0.04, (valor || 0) / 6) * 0.33 };
+  if (valor < 6) return { id: 'medio', texto: 'Medio', pos: 0.33 + ((valor - 2) / 4) * 0.33 };
+  return { id: 'alto', texto: 'Alto', pos: Math.min(0.97, 0.66 + ((valor - 6) / 8) * 0.33) };
+}

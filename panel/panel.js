@@ -1,7 +1,7 @@
 import {
   NODOS, NODO_MAQUETA, METALES, FASES_CICLO, ESCENARIOS, ETIQUETA_ESTADO,
   clasificar, estadoGeneral, formatearMetal, generarMedicion, generarHistorial,
-  crearCanal, leerLecturasGuardadas, guardarLectura
+  crearCanal, leerLecturasGuardadas, guardarLectura, leerReportes, TIPOS_REPORTE
 } from '../comun/simulacion.js';
 
 const $ = (s) => document.querySelector(s);
@@ -98,6 +98,14 @@ $('#btnMaqueta').addEventListener('click', () => {
   ventanaMaqueta = window.open(new URL('../', location.href).href, 'amazonmercury-maqueta', `popup,width=${w},height=${h}`);
 });
 
+let ventanaMiRio = null;
+$('#btnMiRio').addEventListener('click', () => {
+  try {
+    if (ventanaMiRio && !ventanaMiRio.closed) { ventanaMiRio.focus(); return; }
+  } catch { /* otra ventana */ }
+  ventanaMiRio = window.open(new URL(`../comunidad/?lugar=${estado.nodo}`, location.href).href, 'amazonmercury-mirio', 'popup,width=460,height=900');
+});
+
 const maquetaConectada = () => Date.now() - estado.maqueta.ultimo < 12000;
 
 function pintarConexion() {
@@ -160,6 +168,12 @@ function recibir(msg) {
     estado.maqueta.ocupada = false;
     const s = estado.solicitud;
     if (s && s.id === msg.solicitud) terminarSolicitud();
+  }
+  if (msg.tipo === 'reporte' && msg.reporte) {
+    reportesNuevos.add(msg.reporte.id);
+    const t = TIPOS_REPORTE.find((x) => x.id === msg.reporte.tipo);
+    aviso(`Reporte de la comunidad (${msg.reporte.nodo}): ${t ? t.texto : msg.reporte.tipo}`);
+    renderReportes();
   }
   if (msg.tipo === 'ocupado') {
     const s = estado.solicitud;
@@ -241,17 +255,20 @@ function solicitar() {
 
 function iniciarLocal(s) {
   s.local = true;
+  canal.enviar({ tipo: 'inicio', nodo: s.nodo, solicitud: s.id, origen: 'panel' });
   let t = 0;
   FASES_CICLO.forEach((f) => {
     s.timers.push(setTimeout(() => {
       if (estado.solicitud !== s) return;
       avanzarPaso(f.id);
+      canal.enviar({ tipo: 'fase', nodo: s.nodo, solicitud: s.id, fase: f.id });
       if (f.id === 'transmision') {
         const previo = ultimo(s.nodo);
         const med = generarMedicion({ nodo: s.nodo, escenario: s.escenario, origen: 'emergencia' });
         med.salud = { ...previo.salud, calidad: 'OK' };
         guardarLectura(med);
         insertar(med);
+        canal.enviar({ tipo: 'resultado', nodo: s.nodo, solicitud: s.id, medicion: med });
         estado.idsNuevos.add(med.id);
         animarPaquete(s.nodo);
         mostrarResultado(med);
@@ -260,7 +277,10 @@ function iniciarLocal(s) {
     }, t * 1000));
     t += f.demo;
   });
-  s.timers.push(setTimeout(() => terminarSolicitud(), t * 1000));
+  s.timers.push(setTimeout(() => {
+    canal.enviar({ tipo: 'fin', nodo: s.nodo, solicitud: s.id });
+    terminarSolicitud();
+  }, t * 1000));
 }
 
 function mostrarResultado(med) {
@@ -724,11 +744,27 @@ $('#chkVivo').addEventListener('change', (e) => {
     const med = generarMedicion({ nodo: n.id, escenario: Math.random() < 0.1 ? 'precaucion' : 'normal', origen: 'automatica' });
     med.salud = { ...previo.salud };
     insertar(med);
+    canal.enviar({ tipo: 'resultado', nodo: n.id, medicion: med });
     animarPaquete(n.id);
     renderTodo();
     aviso(`Lectura automática de ${n.id}: Hg ${formatearMetal('Hg', med.metales.Hg)} µg/L`);
   }, 20000);
 });
+
+const reportesNuevos = new Set();
+function renderReportes() {
+  const lista = leerReportes();
+  $('#numReportes').textContent = `${lista.length} reportes`;
+  $('#listaReportes').innerHTML = lista.slice(0, 12).map((r) => {
+    const t = TIPOS_REPORTE.find((x) => x.id === r.tipo) || { icono: '💬', texto: r.tipo };
+    return `<article class="reporte ${reportesNuevos.has(r.id) ? 'nuevo' : ''}">
+      <span class="ri">${t.icono}</span>
+      <div><b>${t.texto} · ${r.nodo} ${porNodo[r.nodo] ? porNodo[r.nodo].lugar : ''}</b>
+      ${r.texto ? `<p>"${r.texto.replace(/[<>&]/g, '')}"</p>` : ''}
+      <small>${fmtFecha.format(new Date(r.t))} · ${r.origen}${r.simulado ? ' · simulado' : ''}</small></div>
+    </article>`;
+  }).join('');
+}
 
 /* ---------------- Inicio ---------------- */
 
@@ -754,6 +790,7 @@ function iniciar() {
   renderPasos();
   construirMapa();
   renderTodo();
+  renderReportes();
   pintarConexion();
   let ancho = 0;
   new ResizeObserver(() => {

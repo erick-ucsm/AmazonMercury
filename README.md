@@ -1,6 +1,6 @@
-# AmazonMercury · Maqueta 3D web + Panel de control
+# AmazonMercury · Maqueta 3D + Panel profesional + Mi Río + Pitch
 
-Maqueta 3D interactiva del nodo flotante de monitoreo de mercurio y otros 5 metales (ISC 2027 · Amazonía Viva), con un **panel de control** que se abre en otra ventana y se comunica con la maqueta.
+Maqueta 3D interactiva del nodo flotante de monitoreo de mercurio y otros 5 metales (ISC 2027 · Amazonía Viva), con dos paneles conectados en tiempo real: el **panel profesional** (clientes y autoridades) y **Mi Río** (la comunidad), más el **pitch** en diapositivas web.
 
 > Todos los datos son **simulados** para la demostración.
 
@@ -15,15 +15,23 @@ AmazonMercury/
 ├── assets/               ← logo (completo, ícono y favicon)
 ├── comun/
 │   └── simulacion.js     ← datos simulados, umbrales y canal entre ventanas
-├── panel/                ← panel de control (dashboard)
+├── panel/                ← panel profesional (minería, Estado)
 │   ├── index.html
 │   ├── panel.css
 │   └── panel.js
+├── comunidad/            ← Mi Río: panel simple para la comunidad (celular)
+│   ├── index.html
+│   ├── comunidad.css
+│   └── comunidad.js
+├── pitch/                ← pitch de 4:30 (11 diapositivas + 3 anexos)
+│   ├── index.html, styles.css, script.js
+│   ├── GUION.md
+│   └── assets/
 └── modelo/
     └── amazonmercury.glb   ← tu exportación de Blender (opcional)
 ```
 
-## Cómo se conectan la maqueta y el panel
+## Cómo se conectan la maqueta, el panel profesional y Mi Río
 
 - En la maqueta, el botón **Panel de control** abre `panel/` en otra ventana. En el panel, **Abrir maqueta 3D** hace lo contrario.
 - Las dos ventanas se hablan con `BroadcastChannel` (mismo sitio, sin servidor). Funciona en GitHub Pages y con Live Server, no con doble clic.
@@ -31,6 +39,12 @@ AmazonMercury/
 - Si la maqueta no está abierta, o se elige otro nodo, el panel simula el diagnóstico por su cuenta.
 - En *Opciones de la demostración* puedes forzar el escenario (normal, precaución o pico de mercurio) para mostrar una alerta en el pitch.
 - Las lecturas de emergencia se guardan en el navegador (localStorage) y aparecen en el historial.
+- **Mi Río** (`comunidad/?lugar=AM-02`) muestra el estado del río en lenguaje simple. Cuando el panel o la maqueta miden, Mi Río muestra "Estamos revisando el agua…" y cambia de color al llegar el resultado.
+- El botón **Reportar algo raro** de Mi Río envía el reporte al panel profesional (sección "Reportes de la comunidad").
+
+## Pitch
+
+Abre `pitch/` (con Live Server o GitHub Pages). Controles: ← → avanzar, F pantalla completa, N guion con cronómetro, P vista del orador en otra ventana, **D demo en vivo** (panel + maqueta + Mi Río lado a lado). El guion completo está en `pitch/GUION.md`.
 
 Si `modelo/amazonmercury.glb` no existe, la página muestra un modelo de referencia hecho en código.
 Cuando pones el GLB, la página lo carga sola.
