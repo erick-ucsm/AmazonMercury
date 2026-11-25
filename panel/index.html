@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AmazonMercury · Panel de control</title>
+  <meta name="description" content="Panel de control de la red AmazonMercury: historial de mercurio y metales, mapa de nodos, alertas y diagnóstico de emergencia del río.">
+  <meta name="theme-color" content="#0b2236">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div class="marca">
+      <span class="logo-tile"><img src="../assets/logo-icono.png" alt="Logo AmazonMercury"></span>
+      <div>
+        <h1>AmazonMercury</h1>
+        <p>Panel de control · Red de monitoreo del río Madre de Dios</p>
+      </div>
+    </div>
+    <div class="cab-derecha">
+      <div id="estadoMaqueta" class="pildora desconectada" title="Conexión con la maqueta 3D (nodo AM-02)">
+        <span class="punto"></span><span id="estadoMaquetaTxt">Maqueta 3D: no conectada</span>
+      </div>
+      <div class="reloj"><span id="reloj">--:--</span><small>Hora de Lima</small></div>
+      <button id="btnMaqueta" class="btn btn-claro">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg>
+        Abrir maqueta 3D
+      </button>
+    </div>
+  </header>
+
+  <main class="contenido">
+    <section class="tarjeta emergencia" aria-labelledby="tEmergencia">
+      <div class="em-izq">
+        <p class="sobretitulo">Respuesta rápida</p>
+        <h2 id="tEmergencia">Diagnóstico de emergencia del río</h2>
+        <p class="em-desc">Pide una medición inmediata, fuera del ciclo automático de cada hora. Úsalo ante un aviso de la comunidad, una draga río arriba o un cambio en el color del agua.</p>
+        <div class="em-controles">
+          <label class="campo">
+            <span>Nodo</span>
+            <select id="selNodoEm"></select>
+          </label>
+          <button id="btnEmergencia" class="btn btn-emergencia">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C8 9 6 12 6 15a6 6 0 0 0 12 0c0-3-2-6-6-12z"/><path d="M12 11v4M12 18h.01"/></svg>
+            Solicitar diagnóstico ahora
+          </button>
+        </div>
+        <details class="opciones-demo">
+          <summary>Opciones de la demostración</summary>
+          <label class="campo">
+            <span>Escenario simulado</span>
+            <select id="selEscenario"></select>
+          </label>
+          <label class="interruptor">
+            <input type="checkbox" id="chkVivo">
+            <span>Llegada de lecturas automáticas cada 20 s (modo demo)</span>
+          </label>
+        </details>
+      </div>
+      <div class="em-der">
+        <ol id="pasosEm" class="pasos-em"></ol>
+        <div id="estadoEm" class="estado-em">
+          <p class="em-espera">Sin solicitudes en curso. El nodo seleccionado escucha órdenes 1 segundo cada 5 minutos; en campo el resultado llega en 5 a 12 minutos.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="kpis" aria-label="Resumen de la red">
+      <article class="tarjeta kpi">
+        <p class="kpi-etq">Nodos en línea</p>
+        <p class="kpi-valor" id="kpiNodos">–</p>
+        <p class="kpi-sub" id="kpiNodosSub"></p>
+      </article>
+      <article class="tarjeta kpi" id="kpiHgCaja">
+        <p class="kpi-etq">Mercurio · última lectura</p>
+        <p class="kpi-valor" id="kpiHg">–</p>
+        <p class="kpi-sub" id="kpiHgSub"></p>
+      </article>
+      <article class="tarjeta kpi">
+        <p class="kpi-etq">Picos de mercurio · últimos 7 días</p>
+        <p class="kpi-valor" id="kpiAlertas">–</p>
+        <p class="kpi-sub" id="kpiAlertasSub"></p>
+      </article>
+      <article class="tarjeta kpi">
+        <p class="kpi-etq">Mediciones registradas · 30 días</p>
+        <p class="kpi-valor" id="kpiMediciones">–</p>
+        <p class="kpi-sub">1 por hora por nodo + diagnósticos</p>
+      </article>
+    </section>
+
+    <section class="fila-mapa">
+      <article class="tarjeta mapa-caja">
+        <div class="tarjeta-cab">
+          <h3>Mapa de la red</h3>
+          <span class="nota">Esquema, no a escala</span>
+        </div>
+        <svg id="mapa" class="mapa" viewBox="0 0 760 420" role="img" aria-label="Mapa esquemático de los nodos en el río Madre de Dios"></svg>
+        <div class="leyenda">
+          <span><i class="dot normal"></i>Normal</span>
+          <span><i class="dot precaucion"></i>Precaución (Hg ≥ 2 µg/L)</span>
+          <span><i class="dot alerta"></i>Alerta (Hg ≥ 6 µg/L)</span>
+          <span><i class="linea-lora"></i>Enlace LoRa</span>
+        </div>
+      </article>
+
+      <article class="tarjeta grafica-caja">
+        <div class="tarjeta-cab">
+          <div>
+            <h3 id="tituloGrafica">Mercurio disuelto</h3>
+            <p class="nota" id="subGrafica"></p>
+          </div>
+          <div class="segmentado" role="group" aria-label="Rango de tiempo">
+            <button data-rango="24">24 h</button>
+            <button data-rango="168" class="activo">7 días</button>
+            <button data-rango="720">30 días</button>
+          </div>
+        </div>
+        <div id="graficaHg" class="grafica"></div>
+        <div id="graficaTurb" class="grafica grafica-baja"></div>
+        <div id="tooltip" class="tooltip" hidden></div>
+      </article>
+    </section>
+
+    <section class="fila-detalle">
+      <article class="tarjeta">
+        <div class="tarjeta-cab">
+          <div>
+            <h3>Última medición · <span id="detNodo">AM-02</span></h3>
+            <p class="nota" id="detFecha"></p>
+          </div>
+          <span id="detEstado" class="etiqueta-estado normal">Normal</span>
+        </div>
+        <table class="tabla-metales">
+          <thead><tr><th>Metal</th><th>Lectura (µg/L)</th><th>Respecto al valor guía</th><th>Estado</th></tr></thead>
+          <tbody id="tablaMetales"></tbody>
+        </table>
+        <p class="nota pie-tabla">Electrodo de oro: Hg, As, Pb, Cu · Electrodo de bismuto: Cd, Zn · "&lt;" = por debajo del límite de detección.</p>
+      </article>
+
+      <div class="columna">
+        <article class="tarjeta">
+          <div class="tarjeta-cab"><h3>Calidad del agua</h3></div>
+          <div id="paramsAgua" class="params"></div>
+        </article>
+        <article class="tarjeta">
+          <div class="tarjeta-cab"><h3>Estado del nodo</h3></div>
+          <div id="saludNodo" class="salud"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-cab">
+        <div>
+          <h3>Registro de eventos</h3>
+          <p class="nota">Picos detectados automáticamente y diagnósticos de emergencia</p>
+        </div>
+        <div class="acciones-cab">
+          <button id="btnCsv" class="btn btn-borde">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>
+            Exportar CSV del nodo
+          </button>
+        </div>
+      </div>
+      <div class="tabla-scroll">
+        <table class="tabla-eventos">
+          <thead><tr><th>Fecha y hora</th><th>Nodo</th><th>Evento</th><th>Hg máx.</th><th>Turbidez</th><th>Acción</th></tr></thead>
+          <tbody id="tablaEventos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="pie">
+      <p><strong>Datos simulados para la demostración</strong> (ISC 2027 · Incubadora Scale UCSM). Umbrales del semáforo de mercurio: 2 µg/L (EPA) y 6 µg/L (valor guía de la OMS para agua de consumo); otros metales según los valores guía de la OMS. Pendiente: contrastar con el ECA para agua del Perú (D.S. 004-2017-MINAM). La voltametría en campo mide el metal disuelto; la red se valida cada mes con un laboratorio acreditado.</p>
+    </footer>
+  </main>
+
+  <div id="modalAlerta" class="modal" hidden>
+    <div class="modal-fondo" data-cerrar></div>
+    <article class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="tModal">
+      <button class="btn-x" data-cerrar aria-label="Cerrar">&times;</button>
+      <p class="sobretitulo">Vista previa · no se envía nada</p>
+      <h3 id="tModal">Alerta a comunidades y autoridades</h3>
+      <div class="sms" id="smsTexto"></div>
+      <p class="nota">Destinatarios previstos: comunidades río abajo, ANA, OEFA, DIRESA y gobierno regional. En un despliegue real se enviaría por SMS, radio comunitaria y WhatsApp.</p>
+      <div class="modal-acciones">
+        <button class="btn btn-borde" data-cerrar>Cerrar</button>
+        <button class="btn btn-emergencia" id="btnSimEnvio">Simular envío</button>
+      </div>
+    </article>
+  </div>
+
+  <div id="avisos" class="avisos" aria-live="polite"></div>
+
+  <script type="module" src="panel.js"></script>
+</body>
+</html>

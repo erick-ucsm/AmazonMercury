@@ -5,80 +5,109 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { FASES_CICLO, METALES, NODO_MAQUETA, ETIQUETA_ESTADO, clasificar, estadoGeneral, formatearMetal, generarMedicion, crearCanal, guardarLectura } from './comun/simulacion.js';
 
 const parametros = new URLSearchParams(location.search);
+
 
 const CONFIG = {
   modeloGLB: parametros.get('modelo') || 'modelo/amazonmercury.glb',
   forzarProcedural: parametros.get('modelo') === 'procedural',
   tamanoGLB: 2.6,
   fraccionSumergida: 0.38,
-  rutaDraco: 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/',
-  umbralAlerta: 2.0
+  rutaDraco: 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/'
 };
 
 const COMPONENTES = [
   {
     id: 'casco', nombre: 'Casco flotante', categoria: 'Estructura',
-    funcion: 'Estructura que mantiene el nodo a flote, con bajo centro de gravedad.',
-    info: 'Casco flotante de polietileno rotomoldeado. Diseño de bajo centro de gravedad para estabilidad en corriente.',
-    specs: ['Polietileno rotomoldeado', 'Collar de flotación de alta visibilidad', 'Bandas reflectivas'],
+    funcion: 'Mantiene el nodo a flote, estable en la corriente.',
+    info: 'Casco de polietileno rotomoldeado con collar naranja de alta visibilidad. El peso (baterías, cartucho y celda) va abajo para bajar el centro de gravedad.',
+    specs: ['Polietileno rotomoldeado', 'Collar de flotación naranja', 'Bandas reflectivas', 'Vida útil estimada: 5 años o más'],
     match: /casco|hull|flotador|maceta|buoy|collar/
   },
   {
     id: 'compartimento', nombre: 'Compartimento estanco', categoria: 'Protección',
     funcion: 'Caja sellada IP67 que protege la electrónica.',
-    info: 'Compartimento estanco IP67. Protege ESP32, batería y LoRa de la lluvia y humedad.',
-    specs: ['IP67', 'Junta de sellado perimetral', 'Núcleo seco para la batería'],
+    info: 'Compartimento estanco IP67. Protege el ESP32, el potenciostato, el módulo LoRa, las baterías y el cartucho de reactivo de la lluvia y la humedad.',
+    specs: ['IP67', 'Junta de sellado perimetral', 'Núcleo seco para baterías y reactivo'],
     match: /compart|estanco|caja|enclosure|carcasa/
   },
   {
-    id: 'panel', nombre: 'Panel solar', categoria: 'Energía',
-    funcion: 'Alimentación del nodo.',
-    info: 'Panel solar 5V–6V, 1W–2W. Carga la batería durante el día.',
-    specs: ['5 V – 6 V', '1 W – 2 W', 'Celdas monocristalinas'],
+    id: 'cupula', nombre: 'Cúpula protectora', categoria: 'Protección',
+    funcion: 'Protege el panel solar de golpes, ramas y aves.',
+    info: 'Cúpula baja de policarbonato con filtro UV (no acrílico, que se pone amarillo y se raja). Su forma curva hace que la lluvia limpie el polvo. Tiene rejillas de ventilación en el borde para que no se caliente por dentro y púas en la parte superior para que no se posen las aves.',
+    specs: ['Policarbonato con filtro UV', 'Rejillas de ventilación en el borde', 'Púas antiaves', 'Quita ~10–15 % de luz → panel algo más grande (estimado)'],
+    match: /cupula|domo|dome|cubierta/
+  },
+  {
+    id: 'panel', nombre: 'Panel solar redondo', categoria: 'Energía',
+    funcion: 'Alimenta el nodo y recarga las baterías durante el día.',
+    info: 'Panel solar monocristalino redondo de 3 W y ~19 cm de diámetro, bajo la cúpula. Con 3 W el nodo es autosuficiente todo el año midiendo cada hora, incluso en la época de lluvias de Madre de Dios (estimación de diseño).',
+    specs: ['3 W · 6 V', 'Redondo, ~19 cm de diámetro', 'Celdas monocristalinas', 'Cargador solar con protección de temperatura'],
     match: /panel|solar/
   },
   {
-    id: 'bateria', nombre: 'Batería 18650', categoria: 'Energía',
-    funcion: 'Almacenamiento de energía.',
-    info: 'Batería de litio 18650 (3.7V). Almacena energía para operación nocturna y de bajo consumo.',
-    specs: ['Li-ion 3.7 V', 'Formato 18650', 'Ubicada abajo: baja el centro de gravedad'],
+    id: 'bateria', nombre: 'Baterías 18650 (×2)', categoria: 'Energía',
+    funcion: 'Guardan energía para la noche y los días nublados.',
+    info: 'Dos baterías de litio 18650 en paralelo, abajo del núcleo para bajar el centro de gravedad y mantenerse frescas junto al agua. Sin sol, aguantan unos 10 días midiendo cada hora (estimado).',
+    specs: ['2 × Li-ion 3,7 V en paralelo', '≈ 6000 mAh en total', 'Sin sol: ≈ 10 días (estimado)', 'Cambio cada 2–3 años'],
     match: /bater|18650|battery|pila/
   },
   {
     id: 'esp32', nombre: 'ESP32', categoria: 'Control',
     funcion: 'Cerebro del nodo.',
-    info: 'ESP32: microcontrolador que procesa la señal del sensor y controla la transmisión LoRa.',
-    specs: ['Doble núcleo', 'ADC para el sensor', 'Modo deep-sleep entre muestreos'],
+    info: 'Controla el ciclo de muestreo, la compuerta, la microbomba, el potenciostato y el módulo LoRa. Entre mediciones duerme (deep sleep) y despierta 1 segundo cada 5 minutos para escuchar órdenes de emergencia del panel de control.',
+    specs: ['Doble núcleo', 'Deep sleep entre muestreos', 'Ventana de escucha: 1 s cada 5 min', 'Medición automática cada hora'],
     match: /esp32|esp-32|esp_32|microcontrol/
   },
   {
+    id: 'potenciostato', nombre: 'Potenciostato', categoria: 'Medición',
+    funcion: 'Aplica el voltaje a los electrodos y mide la corriente.',
+    info: 'Placa analógica que hace la voltametría de onda cuadrada (SWASV): primero acumula los metales sobre los electrodos y luego hace un barrido de voltaje. Cada metal se redisuelve a un voltaje distinto, y la corriente indica cuánto hay.',
+    specs: ['Voltametría SWASV', 'Controlado por el ESP32', 'Mide corriente en nA–µA'],
+    match: /potencio|potentiostat|afe/
+  },
+  {
     id: 'lora', nombre: 'Módulo LoRa (433 MHz)', categoria: 'Comunicación',
-    funcion: 'Comunicación de largo alcance.',
-    info: 'Módulo LoRa 433 MHz. Transmite datos a la puerta de enlace sin depender de telefonía móvil.',
-    specs: ['433 MHz', 'Conexión SPI al ESP32', 'Bajo consumo'],
+    funcion: 'Comunicación de largo alcance sin señal celular.',
+    info: 'Envía cada lectura de nodo en nodo hasta la puerta de enlace. Todos los nodos despiertan a la misma hora para reenviar datos, así ninguno gasta batería escuchando todo el tiempo.',
+    specs: ['433 MHz', 'Conexión SPI al ESP32', 'Malla con horario sincronizado'],
     match: /lora|sx127|ra-?02/
   },
   {
     id: 'antena', nombre: 'Antena LoRa', categoria: 'Comunicación',
     funcion: 'Transmisión de señal.',
-    info: 'Antena de 433 MHz. Alcance de varios kilómetros en línea de vista.',
+    info: 'Antena de 433 MHz, fuera de la cúpula. Alcance de varios kilómetros en línea de vista.',
     specs: ['433 MHz', 'Conector SMA', 'Varios km en línea de vista'],
     match: /antena|antenna/
   },
   {
-    id: 'sensor', nombre: 'Sensor de mercurio', categoria: 'Medición',
-    funcion: 'Detección de mercurio en agua.',
-    info: 'Sensor electroquímico selectivo de iones de mercurio (Hg-ISE). Límite de detección en nivel de μg/L. En el prototipo se simula con tira de cambio de color.',
-    specs: ['Hg-ISE', 'Detección en μg/L', 'Sonda cilíndrica con cable interno'],
-    match: /sensor|sonda|probe|electrodo/
+    id: 'sensor', nombre: 'Celda de voltametría', categoria: 'Medición',
+    funcion: 'Mide mercurio y otros 5 metales en la misma muestra.',
+    info: 'Celda electroquímica con electrodo de oro (Hg, As, Cu, Pb), electrodo de bismuto (Cd, Zn), electrodo de referencia y contraelectrodo. Detecta mercurio por debajo del valor guía de la OMS (6 µg/L): un estudio del INIS-OIEA reporta límites de 0,07–0,4 µg/L. Mide el mercurio disuelto; se valida cada mes con laboratorio.',
+    specs: ['Hg · As · Pb · Cd · Cu · Zn', 'Límite de detección Hg ≈ 0,1 µg/L', 'Electrodo serigrafiado: cambio cada 1–3 meses (estimado)', 'Reemplaza al Hg-ISE de la versión 1'],
+    match: /sensor|sonda|probe|electrodo|celda|voltam/
+  },
+  {
+    id: 'sondas', nombre: 'Sondas de calidad del agua', categoria: 'Medición',
+    funcion: 'Miden turbidez, pH, conductividad y temperatura.',
+    info: 'Sonda multiparámetro junto a la celda. Una subida brusca de turbidez puede indicar una draga río arriba y sirve para confirmar un pico de mercurio.',
+    specs: ['Turbidez (NTU)', 'pH', 'Conductividad (µS/cm)', 'Temperatura (°C)'],
+    match: /sondas|multiparam|turbidez|calidad/
+  },
+  {
+    id: 'reactivo', nombre: 'Cartucho de reactivo y microbomba', categoria: 'Muestreo',
+    funcion: 'Prepara la muestra para la voltametría.',
+    info: 'Cartucho de ~1 L con buffer ácido. En cada medición la microbomba dosifica ~1 mL a la muestra. Con un reporte por hora dura unas 6 semanas y se rellena en el mantenimiento.',
+    specs: ['≈ 1 L de buffer ácido', '≈ 1 mL por medición', 'Duración ≈ 6 semanas (estimado)', 'Microbomba peristáltica'],
+    match: /reactivo|cartucho|bomba|pump|reagent/
   },
   {
     id: 'rejilla', nombre: 'Rejilla protectora', categoria: 'Protección',
-    funcion: 'Protección contra peces y residuos.',
-    info: 'Rejilla de protección que evita daños al sensor por fauna acuática y sedimentos, permitiendo el paso del agua.',
-    specs: ['Acero inoxidable', 'Deja pasar el agua'],
+    funcion: 'Protección contra peces, ramas y residuos.',
+    info: 'Rejilla que protege la celda y las sondas de la fauna acuática y los sedimentos grandes, dejando pasar el agua. Se limpia en la revisión diaria.',
+    specs: ['Acero inoxidable', 'Deja pasar el agua', 'Limpieza diaria'],
     match: /rejilla|grill|jaula|cage|malla/
   },
   {
@@ -91,23 +120,20 @@ const COMPONENTES = [
   {
     id: 'compuerta', nombre: 'Compuerta de muestreo', categoria: 'Muestreo', extra: true,
     funcion: 'Deja entrar una pequeña muestra de agua y luego la descarga.',
-    info: 'La compuerta se abre un momento para que entre poca agua a la cámara que rodea el núcleo. El sensor mide esa muestra y luego el agua se descarga por el fondo, pasando por la punta del sensor, antes de iniciar el siguiente ciclo.',
+    info: 'La compuerta se abre un momento para que entre poca agua a la cámara que rodea el núcleo. Se mezcla con el reactivo, la celda la mide y luego el agua se descarga por el fondo antes del siguiente ciclo.',
     specs: ['Apertura temporal', 'Cámara de muestreo anular', 'Drenaje inferior'],
     match: /compuerta|valvula|gate|admision|drenaje/
   }
 ];
 
-const PRIORIDAD_MATCH = ['rejilla', 'antena', 'panel', 'bateria', 'esp32', 'lora', 'compuerta', 'sensor', 'argolla', 'compartimento', 'casco'];
+const PRIORIDAD_MATCH = ['rejilla', 'antena', 'cupula', 'panel', 'bateria', 'esp32', 'potenciostato', 'lora', 'compuerta', 'reactivo', 'sondas', 'sensor', 'argolla', 'compartimento', 'casco'];
+const PASANTES = new Set(['cupula']);
 const TRANSPARENTES_EN_INTERIOR = new Set(['casco', 'compartimento']);
-const INTERNOS = new Set(['bateria', 'esp32', 'lora']);
+const INTERNOS = new Set(['bateria', 'esp32', 'lora', 'potenciostato', 'reactivo']);
 const porId = Object.fromEntries(COMPONENTES.map((c, i) => [c.id, { ...c, numero: i + 1 }]));
 
-const FASES = [
-  { id: 'admision', nombre: 'Admisión', dur: 3.2, texto: 'La compuerta se abre y entra una pequeña muestra de agua' },
-  { id: 'medicion', nombre: 'Medición', dur: 3.6, texto: 'El sensor Hg-ISE mide la muestra y el ESP32 procesa la señal' },
-  { id: 'transmision', nombre: 'Transmisión', dur: 3.2, texto: 'El módulo LoRa envía la lectura a la puerta de enlace (433 MHz)' },
-  { id: 'drenaje', nombre: 'Descarga', dur: 3.0, texto: 'La muestra se descarga por el fondo y el nodo vuelve a reposo' }
-];
+const FASES = FASES_CICLO.map((f) => ({ ...f, dur: f.demo }));
+const F = Object.fromEntries(FASES_CICLO.map((f, i) => [f.id, i]));
 
 const $ = (s) => document.querySelector(s);
 const esMovil = () => window.innerWidth <= 820;
@@ -443,6 +469,75 @@ function texturaPanel() {
   return texturaDe(c);
 }
 
+function texturaPanelRedondo() {
+  const N = 1024;
+  const [c, g] = lienzo(N, N);
+  g.fillStyle = '#c9ced6';
+  g.fillRect(0, 0, N, N);
+  g.save();
+  g.beginPath();
+  g.arc(N / 2, N / 2, N / 2 - 6, 0, Math.PI * 2);
+  g.clip();
+  g.fillStyle = '#0d1d3d';
+  g.fillRect(0, 0, N, N);
+  const lado = 150, gap = 10, R = N / 2 - 22;
+  for (let y = -4; y <= 4; y++) {
+    for (let x = -4; x <= 4; x++) {
+      const cx = N / 2 + x * (lado + gap);
+      const cy = N / 2 + y * (lado + gap);
+      const esquinas = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => Math.hypot(cx + a * lado / 2 - N / 2, cy + b * lado / 2 - N / 2));
+      if (Math.min(...esquinas) > R) continue;
+      const grd = g.createLinearGradient(cx - lado / 2, cy - lado / 2, cx + lado / 2, cy + lado / 2);
+      grd.addColorStop(0, '#16336a');
+      grd.addColorStop(0.5, '#0b1a3a');
+      grd.addColorStop(1, '#1b3d7a');
+      g.save();
+      g.beginPath();
+      g.arc(N / 2, N / 2, R, 0, Math.PI * 2);
+      g.clip();
+      g.fillStyle = grd;
+      g.fillRect(cx - lado / 2, cy - lado / 2, lado, lado);
+      g.strokeStyle = 'rgba(120,150,200,0.22)';
+      g.lineWidth = 1;
+      for (let yy = cy - lado / 2 + 6; yy < cy + lado / 2; yy += 7) {
+        g.beginPath();
+        g.moveTo(cx - lado / 2 + 2, yy);
+        g.lineTo(cx + lado / 2 - 2, yy);
+        g.stroke();
+      }
+      g.fillStyle = '#c9ced6';
+      for (let b = 1; b <= 2; b++) g.fillRect(cx - lado / 2 + (lado * b) / 3 - 2, cy - lado / 2, 4, lado);
+      g.restore();
+    }
+  }
+  g.restore();
+  g.strokeStyle = '#aab2bc';
+  g.lineWidth = 14;
+  g.beginPath();
+  g.arc(N / 2, N / 2, N / 2 - 14, 0, Math.PI * 2);
+  g.stroke();
+  return texturaDe(c);
+}
+
+function texturaCartucho() {
+  const W = 512, H = 256;
+  const [c, g] = lienzo(W, H);
+  g.fillStyle = '#ffffff';
+  g.fillRect(0, 0, W, H);
+  g.fillStyle = '#1f7a8c';
+  g.fillRect(0, 0, W, 46);
+  g.fillStyle = '#ffffff';
+  g.font = '700 30px "Inter", sans-serif';
+  g.fillText('REACTIVO · BUFFER', 20, 33);
+  g.fillStyle = '#0b2236';
+  g.font = '600 26px "Inter", sans-serif';
+  g.fillText('≈ 1 L · 1 mL por medición', 20, 100);
+  g.fillText('Rellenar cada 6 semanas', 20, 140);
+  g.fillStyle = '#f28c28';
+  g.fillRect(0, 210, W, 12);
+  return texturaDe(c);
+}
+
 function texturaEtiquetaCasco() {
   const W = 1600, H = 210;
   const [c, g] = lienzo(W, H);
@@ -645,17 +740,71 @@ function construirProcedural() {
   add(G.compartimento, new THREE.CylinderGeometry(0.045, 0.045, 0.02, 24), M.goma, 0.52, 0.915, -0.33);
   add(G.compartimento, new THREE.CylinderGeometry(0.035, 0.035, 0.08, 16).rotateZ(Math.PI / 2), M.goma, -0.75, 0.7, 0);
 
-  add(G.panel, new RoundedBoxGeometry(1.0, 0.035, 0.84, 2, 0.012), M.aluminio, -0.18, 0.925, 0);
-  const vidrio = new THREE.MeshPhysicalMaterial({ map: texturaPanel(), roughness: 0.12, metalness: 0.25, clearcoat: 1, clearcoatRoughness: 0.05 });
-  add(G.panel, new THREE.PlaneGeometry(0.96, 0.8).rotateX(-Math.PI / 2), vidrio, -0.18, 0.9435, 0);
-  add(G.panel, new THREE.BoxGeometry(0.12, 0.02, 0.06), M.plasticoNegro, -0.18, 0.898, 0.38);
+  const px = -0.15, pz = 0, py = 0.93, rPanel = 0.5;
+  add(G.panel, new THREE.CylinderGeometry(rPanel + 0.035, rPanel + 0.045, 0.04, 96), M.aluminio, px, py, pz);
+  const vidrio = new THREE.MeshPhysicalMaterial({ map: texturaPanelRedondo(), roughness: 0.12, metalness: 0.25, clearcoat: 1, clearcoatRoughness: 0.05 });
+  add(G.panel, new THREE.CircleGeometry(rPanel + 0.03, 96).rotateX(-Math.PI / 2), vidrio, px, py + 0.0205, pz);
 
-  add(G.bateria, new THREE.CylinderGeometry(0.09, 0.09, 0.6, 48, 1, true), new THREE.MeshStandardMaterial({ map: texturaBateria(), roughness: 0.4, side: THREE.DoubleSide }), 0, -0.5, 0);
-  add(G.bateria, new THREE.CylinderGeometry(0.088, 0.088, 0.02, 48), M.acero, 0, -0.19, 0);
-  add(G.bateria, new THREE.CylinderGeometry(0.035, 0.035, 0.018, 24), M.acero, 0, -0.172, 0);
-  add(G.bateria, new THREE.CylinderGeometry(0.088, 0.088, 0.02, 48), M.acero, 0, -0.81, 0);
-  add(G.bateria, new THREE.BoxGeometry(0.24, 0.04, 0.24), M.plasticoNegro, 0, -0.84, 0);
-  for (const y of [-0.3, -0.68]) add(G.bateria, new THREE.TorusGeometry(0.095, 0.008, 8, 32).rotateX(Math.PI / 2), M.plasticoNegro, 0, y, 0);
+  const rCup = 0.575, yCup = py + 0.035, hCup = 0.24;
+  const matCupula = new THREE.MeshPhysicalMaterial({ color: 0xeaf6ff, roughness: 0.04, metalness: 0, transparent: true, opacity: 0.2, clearcoat: 1, clearcoatRoughness: 0.03, depthWrite: false, side: THREE.DoubleSide, envMapIntensity: 1.6 });
+  const domo = add(G.cupula, new THREE.SphereGeometry(rCup, 72, 24, 0, Math.PI * 2, 0, Math.PI / 2), matCupula, px, yCup, pz);
+  domo.scale.y = hCup / rCup;
+  domo.renderOrder = 4;
+  add(G.cupula, new THREE.CylinderGeometry(rCup + 0.02, rCup + 0.03, 0.05, 96, 1, true), M.plasticoNegro, px, yCup - 0.005, pz);
+  for (let i = 0; i < 24; i++) {
+    const a = (i / 24) * Math.PI * 2;
+    const ranura = add(G.cupula, new THREE.BoxGeometry(0.012, 0.026, 0.07), M.goma, px + Math.cos(a) * (rCup + 0.031), yCup - 0.005, pz + Math.sin(a) * (rCup + 0.031));
+    ranura.rotation.y = -a;
+  }
+  const alturaDomo = (r) => yCup + hCup * Math.sqrt(Math.max(0, 1 - (r / rCup) ** 2));
+  for (const [rr, n] of [[0.05, 4], [0.14, 8]]) {
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + rr * 7;
+      const pua = new THREE.Group();
+      pua.position.set(px + Math.cos(a) * rr, alturaDomo(rr), pz + Math.sin(a) * rr);
+      pua.rotation.set(Math.sin(a) * 0.45, 0, -Math.cos(a) * 0.45);
+      add(pua, new THREE.CylinderGeometry(0.0035, 0.006, 0.13, 6), M.acero, 0, 0.065, 0);
+      G.cupula.add(pua);
+    }
+  }
+
+  const matBat = new THREE.MeshStandardMaterial({ map: texturaBateria(), roughness: 0.4, side: THREE.DoubleSide });
+  for (const bx of [-0.105, 0.105]) {
+    add(G.bateria, new THREE.CylinderGeometry(0.09, 0.09, 0.6, 48, 1, true), matBat, bx, -0.5, 0);
+    add(G.bateria, new THREE.CylinderGeometry(0.088, 0.088, 0.02, 48), M.acero, bx, -0.19, 0);
+    add(G.bateria, new THREE.CylinderGeometry(0.035, 0.035, 0.018, 24), M.acero, bx, -0.172, 0);
+    add(G.bateria, new THREE.CylinderGeometry(0.088, 0.088, 0.02, 48), M.acero, bx, -0.81, 0);
+    for (const y of [-0.3, -0.68]) add(G.bateria, new THREE.TorusGeometry(0.095, 0.008, 8, 32).rotateX(Math.PI / 2), M.plasticoNegro, bx, y, 0);
+  }
+  add(G.bateria, new THREE.BoxGeometry(0.46, 0.04, 0.24), M.plasticoNegro, 0, -0.84, 0);
+  add(G.bateria, new THREE.BoxGeometry(0.03, 0.012, 0.03), M.acero, 0, -0.165, 0);
+
+  const rx = 0.24, rz = -0.25;
+  const matBotella = new THREE.MeshPhysicalMaterial({ map: texturaCartucho(), roughness: 0.35, transparent: true, opacity: 0.92 });
+  add(G.reactivo, new THREE.CylinderGeometry(0.085, 0.085, 0.5, 40), matBotella, rx, -0.42, rz);
+  add(G.reactivo, new THREE.CylinderGeometry(0.06, 0.08, 0.05, 32), new THREE.MeshPhysicalMaterial({ color: 0xf3efe2, roughness: 0.3 }), rx, -0.145, rz);
+  add(G.reactivo, new THREE.CylinderGeometry(0.045, 0.045, 0.05, 24), new THREE.MeshStandardMaterial({ color: 0x1f7a8c, roughness: 0.5 }), rx, -0.1, rz);
+  const bomba = new THREE.Group();
+  bomba.position.set(0.25, 0.08, -0.3);
+  G.reactivo.add(bomba);
+  add(bomba, new THREE.CylinderGeometry(0.04, 0.04, 0.11, 24).rotateZ(Math.PI / 2), M.plasticoNegro, -0.04, 0, 0);
+  const cabezal = add(bomba, new THREE.CylinderGeometry(0.052, 0.052, 0.045, 32).rotateZ(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xe9eef2, roughness: 0.4, emissive: 0x000000 }), 0.04, 0, 0);
+  const tubosReactivo = [];
+  const matTubo = new THREE.MeshStandardMaterial({ color: 0xf2c07a, roughness: 0.3, transparent: true, opacity: 0.85, emissive: 0x000000 });
+  tubosReactivo.push(tubo([
+    new THREE.Vector3(rx, -0.08, rz),
+    new THREE.Vector3(0.27, 0.02, -0.3),
+    new THREE.Vector3(0.29, 0.08, -0.3)
+  ], 0.01, matTubo, 16));
+  tubosReactivo.push(tubo([
+    new THREE.Vector3(0.3, 0.08, -0.3),
+    new THREE.Vector3(0.1, 0.0, -0.36),
+    new THREE.Vector3(-0.3, -0.2, -0.3),
+    new THREE.Vector3(-0.6, -0.55, -0.16),
+    new THREE.Vector3(-0.74, -1.0, -0.06),
+    new THREE.Vector3(-0.76, -1.42, -0.04)
+  ], 0.01, matTubo, 60));
+  tubosReactivo.forEach((t) => G.reactivo.add(t));
 
   const ex = -0.28, ey = 0.66, ez = -0.15;
   add(G.esp32, new RoundedBoxGeometry(0.52, 0.022, 0.27, 2, 0.006), M.pcbNegro, ex, ey, ez);
@@ -693,6 +842,14 @@ function construirProcedural() {
   ], 0.008, M.negroCable, 24);
   G.lora.add(pigtail);
 
+  const qx = -0.36, qy = 0.635, qz = 0.27;
+  add(G.potenciostato, new RoundedBoxGeometry(0.24, 0.014, 0.17, 2, 0.004), M.pcbVerde, qx, qy, qz);
+  add(G.potenciostato, new THREE.BoxGeometry(0.07, 0.014, 0.07), M.pcbNegro, qx + 0.02, qy + 0.013, qz);
+  add(G.potenciostato, new THREE.BoxGeometry(0.035, 0.01, 0.025), M.pcbNegro, qx - 0.07, qy + 0.011, qz + 0.05);
+  add(G.potenciostato, new THREE.BoxGeometry(0.035, 0.01, 0.025), M.pcbNegro, qx - 0.07, qy + 0.011, qz - 0.05);
+  add(G.potenciostato, new THREE.BoxGeometry(0.05, 0.03, 0.03), M.plasticoNegro, qx - 0.1, qy + 0.02, qz);
+  for (let i = 0; i < 4; i++) add(G.potenciostato, new THREE.CylinderGeometry(0.008, 0.008, 0.02, 12), M.blindaje, qx + 0.08, qy + 0.016, qz - 0.045 + i * 0.03);
+
   add(G.antena, new THREE.CylinderGeometry(0.035, 0.035, 0.07, 6).rotateZ(Math.PI / 2), M.oro, 0.335, 0.73, 0.27);
   add(G.antena, new THREE.CylinderGeometry(0.028, 0.028, 0.06, 24).rotateZ(Math.PI / 2), M.oro, 0.39, 0.73, 0.27);
   add(G.antena, new THREE.SphereGeometry(0.04, 24, 16), M.goma, 0.44, 0.75, 0.27);
@@ -719,12 +876,31 @@ function construirProcedural() {
     new THREE.Vector3(-0.73, 0.7, 0)
   ], 0.016, M.negroCable, 16);
   G.sensor.add(cableSup);
-  add(G.sensor, new THREE.CylinderGeometry(0.058, 0.058, 0.03, 24), M.goma, sx, -1.43, sz);
-  add(G.sensor, new THREE.CylinderGeometry(0.046, 0.046, 0.14, 32), M.plasticoNegro, sx, -1.51, sz);
-  add(G.sensor, new THREE.CylinderGeometry(0.048, 0.048, 0.015, 32), M.acero, sx, -1.47, sz);
-  const matPunta = new THREE.MeshPhysicalMaterial({ color: 0xe9f1ee, roughness: 0.2, clearcoat: 1, emissive: 0x000000 });
-  const punta = add(G.sensor, new THREE.SphereGeometry(0.042, 32, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), matPunta, sx, -1.58, sz);
+  add(G.sensor, new THREE.CylinderGeometry(0.06, 0.06, 0.03, 24), M.goma, sx, -1.43, sz);
+  add(G.sensor, new THREE.CylinderGeometry(0.072, 0.064, 0.16, 40), M.plasticoNegro, sx, -1.52, sz);
+  add(G.sensor, new THREE.CylinderGeometry(0.074, 0.074, 0.015, 40), M.acero, sx, -1.47, sz);
+  const discoE = (r, mat, dx, dz) => add(G.sensor, new THREE.CylinderGeometry(r, r, 0.012, 24), mat, sx + dx, -1.604, sz + dz);
+  const matOroE = new THREE.MeshStandardMaterial({ color: 0xe0b84f, metalness: 1, roughness: 0.22, emissive: 0x000000 });
+  const matBismuto = new THREE.MeshStandardMaterial({ color: 0xa79bb3, metalness: 0.85, roughness: 0.3, emissive: 0x000000 });
+  const punta = discoE(0.021, matOroE, 0.025, 0);
   punta.userData.puntaSensor = true;
+  const bismuto = discoE(0.019, matBismuto, -0.025, 0);
+  discoE(0.009, new THREE.MeshStandardMaterial({ color: 0xe8eef5, roughness: 0.3 }), 0, 0.034);
+  discoE(0.011, M.acero, 0, -0.034);
+
+  const mx = sx + 0.075, mz = sz + 0.085;
+  const matSonda = new THREE.MeshStandardMaterial({ color: 0x23404a, roughness: 0.45 });
+  add(G.sondas, new THREE.CylinderGeometry(0.028, 0.028, 2.0, 24), matSonda, mx, -0.48, mz);
+  add(G.sondas, new THREE.CylinderGeometry(0.034, 0.034, 0.05, 24), M.goma, mx, 0.55, mz);
+  add(G.sondas, new THREE.CylinderGeometry(0.031, 0.031, 0.015, 24), M.naranja, mx, -1.3, mz);
+  add(G.sondas, new THREE.SphereGeometry(0.011, 16, 10), new THREE.MeshPhysicalMaterial({ color: 0xdff3ff, roughness: 0.05, clearcoat: 1, transparent: true, opacity: 0.85 }), mx + 0.012, -1.488, mz);
+  add(G.sondas, new THREE.CylinderGeometry(0.004, 0.004, 0.04, 8), M.acero, mx - 0.012, -1.495, mz + 0.008);
+  const ventana = add(G.sondas, new THREE.CylinderGeometry(0.009, 0.009, 0.006, 16), new THREE.MeshStandardMaterial({ color: 0x113344, emissive: 0x38bdf8, emissiveIntensity: 0.4 }), mx, -1.481, mz - 0.014);
+  G.sondas.add(tubo([
+    new THREE.Vector3(mx, 0.57, mz),
+    new THREE.Vector3(mx, 0.68, mz),
+    new THREE.Vector3(-0.71, 0.7, 0.08)
+  ], 0.01, M.negroCable, 12));
 
   const rTop = -0.905, rBot = -1.7, rr = 0.165;
   const barraGeo = new THREE.CylinderGeometry(0.008, 0.008, rTop - rBot, 8);
@@ -808,8 +984,12 @@ function construirProcedural() {
   const offsets = {
     casco: [0, 0, 0],
     compartimento: [0, 0.95, 0],
-    panel: [0, 1.6, 0],
-    bateria: [1.75, 0.35, 0.2],
+    cupula: [0, 2.1, 0],
+    panel: [0, 1.75, 0],
+    bateria: [1.75, 0.35, 0.35],
+    potenciostato: [-0.75, 1.35, 0.6],
+    sondas: [-1.35, -0.2, 0.45],
+    reactivo: [1.1, 0.15, -1.45],
     esp32: [-0.2, 1.42, -0.35],
     lora: [0.35, 1.45, 0.45],
     antena: [0.75, 1.1, 0.45],
@@ -821,8 +1001,12 @@ function construirProcedural() {
   const anclas = {
     casco: [0.98, 0.42, 0.62],
     compartimento: [-0.62, 0.82, 0.42],
-    panel: [-0.45, 0.95, -0.3],
-    bateria: [0.09, -0.45, 0],
+    cupula: [-0.15, 1.2, 0],
+    panel: [-0.62, 0.97, 0.2],
+    bateria: [0.2, -0.45, 0],
+    potenciostato: [-0.48, 0.66, 0.36],
+    sondas: [-0.7, -0.7, 0.14],
+    reactivo: [0.24, -0.2, -0.33],
     esp32: [-0.42, 0.7, -0.22],
     lora: [0.02, 0.67, 0.3],
     antena: [0.32, 1.9, 0.27],
@@ -836,9 +1020,14 @@ function construirProcedural() {
     aguaCamara,
     pivoteCompuerta: pivote,
     puntaSensor: punta,
+    mallasSensor: [bismuto],
+    ventanaTurbidez: ventana,
+    cabezalBomba: cabezal,
+    tubosReactivo,
     puntaAntena,
     espuma,
     entrada: crearParticulas(34, 0x9cc9d6),
+    remolino: crearParticulas(26, 0xb9e6f0),
     salida: crearParticulas(22, 0x9cc9d6),
     led
   };
@@ -1204,7 +1393,7 @@ function componenteBajoPuntero(e) {
   for (const h of hits) {
     if (!h.object.visible) continue;
     const id = h.object.userData.componente;
-    if (estado.interior && TRANSPARENTES_EN_INTERIOR.has(id)) {
+    if (PASANTES.has(id) || (estado.interior && TRANSPARENTES_EN_INTERIOR.has(id))) {
       respaldo = respaldo || id;
       continue;
     }
@@ -1271,7 +1460,8 @@ $('#btnReset').addEventListener('click', () => {
   setInterior(false);
   vistaInicial(true);
 });
-$('#btnCiclo').addEventListener('click', iniciarCiclo);
+$('#btnCiclo').addEventListener('click', () => iniciarCiclo());
+$('#btnPanel').addEventListener('click', abrirPanel);
 
 const modal = $('#modal');
 $('#btnProyecto').addEventListener('click', () => {
@@ -1290,28 +1480,58 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft' && estado.seleccion) moverSeleccion(-1);
 });
 
-function generarLectura() {
-  return Math.random() < 0.3 ? 2.2 + Math.random() * 4 : 0.15 + Math.random() * 1.2;
+let ventanaPanel = null;
+function abrirPanel() {
+  const url = new URL('panel/', location.href).href;
+  try {
+    if (ventanaPanel && !ventanaPanel.closed) {
+      ventanaPanel.focus();
+      return;
+    }
+  } catch { /* otra ventana */ }
+  const w = Math.min(1440, screen.availWidth - 40), h = Math.min(920, screen.availHeight - 40);
+  ventanaPanel = window.open(url, 'amazonmercury-panel', `popup,width=${w},height=${h}`);
+  if (!ventanaPanel) location.href = url;
 }
 
-function iniciarCiclo() {
+const canal = crearCanal((msg) => {
+  if (!msg || !msg.tipo) return;
+  if (msg.tipo === 'ping') canal.enviar({ tipo: 'pong', nodo: NODO_MAQUETA, ocupado: !!estado.ciclo });
+  if (msg.tipo === 'solicitar' && (!msg.nodo || msg.nodo === NODO_MAQUETA)) {
+    if (estado.ciclo) {
+      canal.enviar({ tipo: 'ocupado', solicitud: msg.solicitud, nodo: NODO_MAQUETA });
+      return;
+    }
+    iniciarCiclo({ escenario: msg.escenario, origen: 'emergencia', solicitud: msg.solicitud });
+  }
+});
+canal.enviar({ tipo: 'hola', nodo: NODO_MAQUETA });
+window.addEventListener('beforeunload', () => canal.enviar({ tipo: 'adios', nodo: NODO_MAQUETA }));
+
+function iniciarCiclo(opciones = {}) {
   if (estado.ciclo) return;
-  estado.ciclo = { t: 0, fase: -1, valor: generarLectura(), interiorPrevio: estado.interior, fin: 0 };
+  const origen = opciones.origen || 'manual';
+  const medicion = generarMedicion({ nodo: NODO_MAQUETA, escenario: opciones.escenario || 'aleatorio', origen });
+  estado.ciclo = { t: 0, fase: -1, medicion, solicitud: opciones.solicitud || null, origen, interiorPrevio: estado.interior };
   setExplosion(false, false);
   setInterior(true);
   if (estado.autoRotar) setAutoRotar(false);
   $('#btnCiclo').disabled = true;
   const hud = $('#hud');
   hud.hidden = false;
+  hud.classList.toggle('emergencia', origen === 'emergencia');
+  $('#hudOrigen').hidden = origen !== 'emergencia';
   $('#hudLectura').hidden = true;
+  $('#hudLectura').innerHTML = '';
   $('#hudPasos').innerHTML = FASES.map((f, i) => `<div class="hud-paso" data-i="${i}">${i + 1}. ${f.nombre}</div>`).join('');
+  canal.enviar({ tipo: 'inicio', nodo: NODO_MAQUETA, solicitud: estado.ciclo.solicitud, origen });
   if (!estado.seleccion) {
     estado.foco = {
       t: 0,
       desdeT: controls.target.clone(),
-      haciaT: new THREE.Vector3(-0.3, -0.2, 0),
+      haciaT: new THREE.Vector3(-0.4, -0.75, 0),
       desdeC: camera.position.clone(),
-      haciaC: new THREE.Vector3(-3.6, 0.9, 3.9).multiplyScalar(camera.aspect < 0.9 ? 1.5 : 1)
+      haciaC: new THREE.Vector3(-4.3, -0.05, 4.6).multiplyScalar(camera.aspect < 0.9 ? 1.5 : 1)
     };
   }
 }
@@ -1324,15 +1544,18 @@ function terminarCiclo() {
     extras.aguaCamara.scale.y = 0.0001;
     extras.aguaCamara.visible = false;
   }
-  if (extras.entrada) extras.entrada.visible = false;
-  if (extras.salida) extras.salida.visible = false;
+  ['entrada', 'salida', 'remolino'].forEach((k) => { if (extras[k]) extras[k].visible = false; });
   anillos.forEach((a) => { a.visible = false; });
   pintarPunta(null);
+  pintarReactivo(0);
+  canal.enviar({ tipo: 'fin', nodo: NODO_MAQUETA, solicitud: c.solicitud });
   estado.ciclo = null;
   setTimeout(() => {
     if (!estado.ciclo) $('#hud').hidden = true;
-  }, 4500);
-  $('#hudTexto').textContent = 'Ciclo completo. Próximo muestreo según el intervalo programado.';
+  }, 9000);
+  $('#hudTexto').textContent = c.origen === 'emergencia'
+    ? 'Diagnóstico enviado al panel de control. El nodo vuelve a su ciclo automático de cada hora.'
+    : 'Ciclo completo. Próxima medición automática en 1 hora.';
 }
 
 const suave = (x) => x * x * (3 - 2 * x);
@@ -1355,6 +1578,36 @@ function pintarPunta(color, intensidad = 0) {
       mat.emissiveIntensity = intensidad;
     }
   });
+}
+
+function pintarReactivo(k) {
+  const lista = [];
+  if (extras.cabezalBomba) lista.push(extras.cabezalBomba);
+  if (extras.tubosReactivo) lista.push(...extras.tubosReactivo);
+  lista.forEach((m) => materialesDe(m).forEach((mat) => {
+    if (!mat.emissive) return;
+    if (k <= 0) {
+      const b = mat.userData.base;
+      if (b && b.emissive) mat.emissive.copy(b.emissive);
+      mat.emissiveIntensity = b ? b.emissiveIntensity : 1;
+    } else {
+      mat.emissive.set(0xf28c28);
+      mat.emissiveIntensity = k;
+    }
+  }));
+}
+
+function animarParticulas(im, activo, fn) {
+  if (!im) return;
+  im.visible = activo;
+  if (!activo) return;
+  const d = new THREE.Object3D();
+  im.userData.semillas.forEach((sem, i) => {
+    fn(d, sem);
+    d.updateMatrix();
+    im.setMatrixAt(i, d.matrix);
+  });
+  im.instanceMatrix.needsUpdate = true;
 }
 
 function actualizarCiclo(dt, t) {
@@ -1380,20 +1633,30 @@ function actualizarCiclo(dt, t) {
   $('#hudBarra').style.width = `${(c.t / total) * 100}%`;
   if (idx !== c.fase) {
     c.fase = idx;
-    $('#hudTexto').textContent = FASES[idx].texto;
+    const f = FASES[idx];
+    $('#hudTexto').innerHTML = `${f.texto}<span class="hud-real">Tiempo real en campo: ${f.real}</span>`;
     document.querySelectorAll('.hud-paso').forEach((el, i) => {
       el.classList.toggle('activo', i === idx);
       el.classList.toggle('hecho', i < idx);
     });
-    if (idx === 2) mostrarLectura(c.valor);
+    canal.enviar({ tipo: 'fase', nodo: NODO_MAQUETA, solicitud: c.solicitud, fase: f.id, indice: idx });
+    if (idx === F.transmision) {
+      c.medicion.t = Date.now();
+      mostrarLectura(c.medicion);
+      guardarLectura(c.medicion);
+      canal.enviar({ tipo: 'resultado', nodo: NODO_MAQUETA, solicitud: c.solicitud, medicion: c.medicion });
+    }
   }
+
+  const general = estadoGeneral(c.medicion);
+  const colorEstado = general === 'alerta' ? 0xff3b3b : general === 'precaucion' ? 0xffb020 : 0x22e08f;
 
   let apertura = 0;
   let nivel = 0;
-  if (idx === 0) {
+  if (idx === F.admision) {
     apertura = local < 0.72 ? suave(limitar(local / 0.2)) : suave(limitar((1 - local) / 0.22));
     nivel = suave(limitar(local / 0.85));
-  } else if (idx === 1 || idx === 2) {
+  } else if (idx < F.descarga) {
     nivel = 1;
   } else {
     nivel = 1 - suave(limitar(local / 0.85));
@@ -1402,52 +1665,46 @@ function actualizarCiclo(dt, t) {
   if (extras.aguaCamara) {
     extras.aguaCamara.scale.y = Math.max(nivel * 0.6, 0.0001);
     extras.aguaCamara.visible = estado.interior && nivel > 0.01;
+    extras.aguaCamara.material.color.set(idx >= F.reactivo && idx < F.descarga ? 0x8a8a5a : 0x6f8a63);
   }
 
-  if (extras.entrada) {
-    const activo = idx === 0 && apertura > 0.4;
-    extras.entrada.visible = activo;
-    if (activo) {
-      const d = new THREE.Object3D();
-      extras.entrada.userData.semillas.forEach(([a, b, s], i) => {
-        const p = (t * 0.55 + s) % 1;
-        const th = Math.PI * 1.5 + (a - 0.5) * 0.42;
-        const r = THREE.MathUtils.lerp(1.75, 0.8, p);
-        d.position.set(Math.sin(th) * r, -0.32 + (b - 0.5) * 0.2 - p * 0.18, Math.cos(th) * r);
-        d.scale.setScalar(p > 0.92 ? (1 - p) * 12 : 1);
-        d.updateMatrix();
-        extras.entrada.setMatrixAt(i, d.matrix);
-      });
-      extras.entrada.instanceMatrix.needsUpdate = true;
-    }
-  }
-  if (extras.salida) {
-    const activo = idx === 3 && local < 0.92;
-    extras.salida.visible = activo;
-    if (activo) {
-      const d = new THREE.Object3D();
-      extras.salida.userData.semillas.forEach(([a, b, s], i) => {
-        const p = (t * 0.9 + s) % 1;
-        d.position.set(-0.66 - p * 0.12 + (a - 0.5) * 0.05, -0.97 - p * 0.75, 0.1 - p * 0.08 + (b - 0.5) * 0.05);
-        d.scale.setScalar(1 - p * 0.5);
-        d.updateMatrix();
-        extras.salida.setMatrixAt(i, d.matrix);
-      });
-      extras.salida.instanceMatrix.needsUpdate = true;
-    }
-  }
+  animarParticulas(extras.entrada, idx === F.admision && apertura > 0.4, (d, [a, b, s]) => {
+    const p = (t * 0.55 + s) % 1;
+    const th = Math.PI * 1.5 + (a - 0.5) * 0.42;
+    const r = THREE.MathUtils.lerp(1.75, 0.8, p);
+    d.position.set(Math.sin(th) * r, -0.32 + (b - 0.5) * 0.2 - p * 0.18, Math.cos(th) * r);
+    d.scale.setScalar(p > 0.92 ? (1 - p) * 12 : 1);
+  });
+  animarParticulas(extras.remolino, idx === F.deposito || idx === F.barrido, (d, [a, b, s]) => {
+    const giro = t * (idx === F.deposito ? 3.2 : 1.2) + s * Math.PI * 2;
+    const r = 0.09 + a * 0.06;
+    d.position.set(-0.8 + Math.cos(giro) * r, -1.62 - b * 0.06 + Math.sin(giro * 2) * 0.01, Math.sin(giro) * r);
+    d.scale.setScalar(0.55 + b * 0.4);
+  });
+  animarParticulas(extras.salida, idx === F.descarga && local < 0.92, (d, [a, b]) => {
+    const p = (t * 0.9 + a) % 1;
+    d.position.set(-0.66 - p * 0.12 + (a - 0.5) * 0.05, -0.97 - p * 0.75, 0.1 - p * 0.08 + (b - 0.5) * 0.05);
+    d.scale.setScalar(1 - p * 0.5);
+  });
 
-  if (idx === 1) {
-    pintarPunta(0x34d399, 0.6 + Math.sin(t * 10) * 0.5);
-  } else if (idx === 2) {
-    pintarPunta(c.valor >= CONFIG.umbralAlerta ? 0xff3b3b : 0x22e08f, 0.9);
+  pintarReactivo(idx === F.reactivo ? 0.5 + Math.sin(t * 14) * 0.4 : 0);
+
+  if (idx === F.deposito) {
+    pintarPunta(0xf2c14e, 0.35 + Math.sin(t * 4) * 0.3);
+  } else if (idx === F.barrido) {
+    pintarPunta(Math.sin(t * 22) > 0 ? 0x5eead4 : 0xf2c14e, 0.9);
+  } else if (idx === F.transmision) {
+    pintarPunta(colorEstado, 0.9);
   } else {
     pintarPunta(null);
+  }
+  if (extras.ventanaTurbidez) {
+    materialesDe(extras.ventanaTurbidez).forEach((m) => { m.emissiveIntensity = idx === F.barrido ? 1.4 + Math.sin(t * 18) * 0.6 : 0.4; });
   }
 
   const puntaA = extras.puntaAntena;
   anillos.forEach((a, i) => {
-    if (idx !== 2 || !puntaA) {
+    if (idx !== F.transmision || !puntaA) {
       a.visible = false;
       return;
     }
@@ -1456,16 +1713,29 @@ function actualizarCiclo(dt, t) {
     a.position.y -= p * 0.3;
     a.scale.setScalar(0.08 + p * 3.2);
     a.material.opacity = (1 - p) * 0.9;
-    a.material.color.set(c.valor >= CONFIG.umbralAlerta ? 0xff8a8a : 0x5eead4);
+    a.material.color.set(general === 'alerta' ? 0xff8a8a : general === 'precaucion' ? 0xffc46b : 0x5eead4);
     a.visible = true;
   });
 }
 
-function mostrarLectura(valor) {
-  const alerta = valor >= CONFIG.umbralAlerta;
+function mostrarLectura(med) {
+  const general = estadoGeneral(med);
+  const filas = METALES.map((m) => {
+    const e = clasificar(m, med.metales[m.id].valor);
+    return `<div class="hl-fila ${e}"><b>${m.id}</b><span>${formatearMetal(m, med.metales[m.id])}</span><em>${ETIQUETA_ESTADO[e]}</em></div>`;
+  }).join('');
+  const agua = med.agua;
   const el = $('#hudLectura');
   el.hidden = false;
-  el.innerHTML = `Hg: <span class="valor ${alerta ? 'alerta' : 'ok'}">${valor.toFixed(2)} μg/L</span> · <span class="${alerta ? 'alerta' : 'ok'}">${alerta ? 'ALERTA' : 'Normal'}</span><small>Lectura simulada para la demostración · umbral de ejemplo: ${CONFIG.umbralAlerta.toFixed(2)} μg/L</small>`;
+  el.innerHTML = `
+    <div class="hl-cab ${general}">
+      <span>Hg: <strong>${formatearMetal('Hg', med.metales.Hg)} µg/L</strong></span>
+      <span class="hl-estado">${ETIQUETA_ESTADO[clasificar('Hg', med.metales.Hg.valor)]}</span>
+    </div>
+    <div class="hl-grid">${filas}</div>
+    <p class="hl-agua">Turbidez ${agua.turbidez.toFixed(0)} NTU${agua.turbidez > 450 ? ' ↑' : ''} · pH ${agua.ph.toFixed(1)} · ${agua.conductividad.toFixed(0)} µS/cm · ${agua.temperatura.toFixed(1)} °C</p>
+    ${general === 'alerta' ? '<p class="hl-msg">⚠ No use agua del río para beber ni cocinar hasta nuevo aviso.</p>' : ''}
+    <small>Lectura simulada para la demostración · µg/L · umbrales de Hg: 2 µg/L (EPA) y 6 µg/L (OMS)</small>`;
 }
 
 function aplicarExplosion(dt) {
@@ -1519,7 +1789,18 @@ let cielo;
 let rio;
 const reloj = new THREE.Clock();
 
+let ultimoFrame = performance.now();
+setInterval(() => {
+  const ahora = performance.now();
+  if (estado.ciclo && ahora - ultimoFrame > 400) {
+    const dt = Math.min((ahora - ultimoFrame) / 1000, 1.5);
+    ultimoFrame = ahora;
+    actualizarCiclo(dt, reloj.elapsedTime);
+  }
+}, 250);
+
 function animar() {
+  ultimoFrame = performance.now();
   const dtReal = Math.min(reloj.getDelta(), 0.25);
   const dt = Math.min(dtReal, 0.1);
   const t = reloj.elapsedTime;
@@ -1532,7 +1813,7 @@ function animar() {
   aplicarResaltado(t);
   if (extras.espuma) extras.espuma.rotation.y = t * 0.03;
   if (extras.led) {
-    const on = Math.sin(t * 3) > 0.6 || (estado.ciclo && estado.ciclo.fase === 2);
+    const on = Math.sin(t * 3) > 0.6 || (estado.ciclo && estado.ciclo.fase === F.transmision);
     extras.led.material.emissiveIntensity = on ? 2 : 0.15;
   }
   if (mixer) mixer.update(dt);

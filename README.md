@@ -1,18 +1,36 @@
-# AmazonMercury · Maqueta 3D web
+# AmazonMercury · Maqueta 3D web + Panel de control
 
-Maqueta 3D interactiva del nodo flotante de monitoreo de mercurio (ISC 2027 · Amazonía Viva).
+Maqueta 3D interactiva del nodo flotante de monitoreo de mercurio y otros 5 metales (ISC 2027 · Amazonía Viva), con un **panel de control** que se abre en otra ventana y se comunica con la maqueta.
+
+> Todos los datos son **simulados** para la demostración.
 
 ## Estructura de la carpeta
 
 ```
-amazonmercury/
-├── index.html
+AmazonMercury/
+├── index.html            ← maqueta 3D
 ├── styles.css
 ├── script.js
 ├── README.md
+├── assets/               ← logo (completo, ícono y favicon)
+├── comun/
+│   └── simulacion.js     ← datos simulados, umbrales y canal entre ventanas
+├── panel/                ← panel de control (dashboard)
+│   ├── index.html
+│   ├── panel.css
+│   └── panel.js
 └── modelo/
     └── amazonmercury.glb   ← tu exportación de Blender (opcional)
 ```
+
+## Cómo se conectan la maqueta y el panel
+
+- En la maqueta, el botón **Panel de control** abre `panel/` en otra ventana. En el panel, **Abrir maqueta 3D** hace lo contrario.
+- Las dos ventanas se hablan con `BroadcastChannel` (mismo sitio, sin servidor). Funciona en GitHub Pages y con Live Server, no con doble clic.
+- En el panel, **Solicitar diagnóstico ahora** con el nodo **AM-02** hace que la maqueta ejecute el ciclo animado (admisión → reactivo → depósito → barrido → transmisión → descarga) y el resultado vuelve al panel.
+- Si la maqueta no está abierta, o se elige otro nodo, el panel simula el diagnóstico por su cuenta.
+- En *Opciones de la demostración* puedes forzar el escenario (normal, precaución o pico de mercurio) para mostrar una alerta en el pitch.
+- Las lecturas de emergencia se guardan en el navegador (localStorage) y aparecen en el historial.
 
 Si `modelo/amazonmercury.glb` no existe, la página muestra un modelo de referencia hecho en código.
 Cuando pones el GLB, la página lo carga sola.
@@ -25,12 +43,16 @@ El nombre del objeto, o de su Empty padre, tiene que contener una de estas palab
 |------------------------|-----------------------------|
 | Casco flotante         | `casco`                     |
 | Compartimento estanco  | `compartimento`             |
+| Cúpula protectora      | `cupula`                    |
 | Panel solar            | `panel_solar`               |
-| Batería 18650          | `bateria`                   |
+| Baterías 18650 (×2)    | `bateria`                   |
 | ESP32                  | `esp32`                     |
+| Potenciostato          | `potenciostato`             |
 | Módulo LoRa            | `lora`                      |
 | Antena LoRa            | `antena`                    |
-| Sensor de mercurio     | `sensor`                    |
+| Celda de voltametría   | `sensor` o `celda`          |
+| Sondas de calidad      | `sondas`                    |
+| Cartucho de reactivo   | `reactivo` o `cartucho`     |
 | Rejilla protectora     | `rejilla`                   |
 | Argolla de amarre      | `argolla`                   |
 | Compuerta de muestreo  | `compuerta`                 |
@@ -83,5 +105,5 @@ git push -u origin main
 
 - `CONFIG.tamanoGLB`: tamaño al que se escala tu modelo.
 - `CONFIG.fraccionSumergida`: qué parte del modelo queda bajo el agua (0.38 = 38 %).
-- `CONFIG.umbralAlerta`: umbral de ejemplo (μg/L) para mostrar "ALERTA" en la simulación. Cámbialo por el valor normativo que usen en su presentación.
 - Los textos de cada componente están en el arreglo `COMPONENTES`.
+- Los umbrales del semáforo, los límites de detección y los nodos del mapa están en `comun/simulacion.js` (`METALES` y `NODOS`). Hg: precaución desde 2 µg/L (EPA) y alerta desde 6 µg/L (OMS). Pendiente: contrastar con el ECA para agua del Perú (D.S. 004-2017-MINAM).
