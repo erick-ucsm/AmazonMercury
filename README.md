@@ -1,8 +1,6 @@
 # AmazonMercury · Maqueta 3D + Panel profesional + Mi Río + Pitch
 
 Maqueta 3D interactiva del nodo flotante de monitoreo de mercurio y otros 5 metales (ISC 2027 · Amazonía Viva), con dos paneles conectados en tiempo real: el **panel profesional** (clientes y autoridades) y **Mi Río** (la comunidad), más el **pitch** en diapositivas web.
-- link de la maqueta 3D: https://erick-ucsm.github.io/AmazonMercury/
-- link de las diapositivas del pitch: https://erick-ucsm.github.io/AmazonMercury/pitch/
 
 > Todos los datos son **simulados** para la demostración.
 
@@ -123,3 +121,15 @@ git push -u origin main
 - `CONFIG.fraccionSumergida`: qué parte del modelo queda bajo el agua (0.38 = 38 %).
 - Los textos de cada componente están en el arreglo `COMPONENTES`.
 - Los umbrales del semáforo, los límites de detección y los nodos del mapa están en `comun/simulacion.js` (`METALES` y `NODOS`). Hg: precaución desde 2 µg/L (EPA) y alerta desde 6 µg/L (OMS). Pendiente: contrastar con el ECA para agua del Perú (D.S. 004-2017-MINAM).
+
+## Demo con los celulares del jurado (Firebase)
+
+Para que la maqueta, el panel profesional y Mi Río se comuniquen **entre dispositivos distintos**, se usa Firebase Realtime Database.
+
+1. Crea un proyecto en https://console.firebase.google.com y, dentro, una **Realtime Database** (ubicación `us-central1`, modo bloqueado).
+2. En **Realtime Database → Reglas**, pega el contenido de `comun/reglas-firebase.json` y publica.
+3. En **Configuración del proyecto → Tus apps → Web (</>)**, registra una app y copia el objeto `firebaseConfig`.
+4. Pégalo en `comun/firebase-config.js` en lugar de `null`. Debe incluir `databaseURL`.
+5. Sube los cambios a GitHub. En la maqueta aparecerá **"En vivo · N dispositivos"**, y el botón **Abrir en celulares** muestra los QR.
+
+Si `FIREBASE_CONFIG` queda en `null` o no hay internet, todo sigue funcionando como antes, dentro de una sola computadora.

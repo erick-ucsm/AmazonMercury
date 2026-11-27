@@ -31,11 +31,29 @@
         <p class="subtitulo">Nodo flotante de monitoreo de mercurio · Madre de Dios</p>
       </div>
     </div>
+    <div class="topbar-der">
+    <span id="redMaqueta" class="red-estado" hidden><i></i><b>Local</b></span>
+    <button id="btnJueces" class="btn btn-fantasma btn-jueces" title="Mostrar los QR para que el jurado abra los paneles en su celular">📱 <span class="txt-largo">Abrir en celulares</span><span class="txt-corto">QR</span></button>
     <button id="btnProyecto" class="btn btn-primario">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
       <span class="txt-largo">Ver información del proyecto</span><span class="txt-corto">Proyecto</span>
     </button>
+    </div>
   </header>
+
+  <div id="modalJueces" class="modal-jueces" hidden>
+    <div class="mj-caja" role="dialog" aria-label="Abrir los paneles en el celular">
+      <button class="btn-cerrar" data-cerrar-jueces aria-label="Cerrar">&times;</button>
+      <h2>Pruébenlo en su celular</h2>
+      <p>Escaneen un código. Cuando la maqueta tome una muestra, el resultado llegará a su celular en tiempo real.</p>
+      <div class="mj-qrs">
+        <figure><img src="assets/qr-jueces-mirio.svg" alt="QR de Mi Río"><figcaption><b>Mi Río</b>Panel de la comunidad</figcaption></figure>
+        <figure><img src="assets/qr-jueces-panel.svg" alt="QR del panel profesional"><figcaption><b>Panel profesional</b>Para mineras y autoridades</figcaption></figure>
+      </div>
+      <p id="mjConectados" class="mj-conectados">Conectando…</p>
+    </div>
+  </div>
+  <div id="avisoMaqueta" class="aviso-maqueta" hidden></div>
 
   <section class="lateral">
     <article class="tarjeta intro">

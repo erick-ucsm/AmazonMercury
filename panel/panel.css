@@ -293,3 +293,14 @@ td { padding: 10px; border-bottom: 1px solid #edf2f4; font-size: 0.88rem; vertic
   .reloj { display: none; }
   .marca p { font-size: .74rem; }
 }
+
+/* Celular: que nada se salga por la derecha */
+@media (max-width: 680px) {
+  html, body { overflow-x: hidden; }
+  .contenido, .contenido > *, .emergencia, .emergencia > *, .em-izq, .em-der { min-width: 0; max-width: 100%; }
+  .emergencia { padding: 16px; }
+  .em-controles > *, .em-controles select, .em-controles button, .campo select { max-width: 100%; }
+  .em-controles button { width: 100%; justify-content: center; }
+  .pasos-em li { min-width: 0; }
+  .avisos { left: 12px; right: 12px; }
+}

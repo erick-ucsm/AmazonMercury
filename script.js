@@ -1500,11 +1500,54 @@ const canal = crearCanal((msg) => {
   if (msg.tipo === 'solicitar' && (!msg.nodo || msg.nodo === NODO_MAQUETA)) {
     if (estado.ciclo) {
       canal.enviar({ tipo: 'ocupado', solicitud: msg.solicitud, nodo: NODO_MAQUETA });
+      avisoMaqueta('📡 Llegó otra solicitud de muestra, pero el nodo ya está midiendo.');
       return;
     }
+    avisoMaqueta('📡 Solicitud de muestra recibida desde el panel profesional');
     iniciarCiclo({ escenario: msg.escenario, origen: 'emergencia', solicitud: msg.solicitud });
   }
+  if (msg.tipo === 'reporte' && msg.reporte) avisoMaqueta('💬 Llegó un reporte de la comunidad desde Mi Río');
+}, { pagina: 'maqueta' });
+
+function avisoMaqueta(texto) {
+  const el = $('#avisoMaqueta');
+  el.textContent = texto;
+  el.hidden = false;
+  el.classList.remove('entra');
+  void el.offsetWidth;
+  el.classList.add('entra');
+  clearTimeout(avisoMaqueta.t);
+  avisoMaqueta.t = setTimeout(() => { el.hidden = true; }, 6000);
+}
+
+function contarConectados(red) {
+  const lista = Object.values(red.conectados || {});
+  const n = (p) => lista.filter((x) => x && x.pagina === p).length;
+  return { panel: n('panel'), mirio: n('mirio'), total: lista.length };
+}
+canal.alCambiarRed((red) => {
+  const el = $('#redMaqueta');
+  const txtJ = $('#mjConectados');
+  if (red.estado === 'local') {
+    el.hidden = true;
+    txtJ.textContent = 'Falta configurar Firebase (comun/firebase-config.js): por ahora solo funciona en esta computadora.';
+    return;
+  }
+  el.hidden = false;
+  el.className = `red-estado ${red.estado}`;
+  const c = contarConectados(red);
+  const otros = c.panel + c.mirio;
+  el.querySelector('b').textContent = red.estado === 'en-linea'
+    ? `En vivo · ${otros} ${otros === 1 ? 'dispositivo' : 'dispositivos'}`
+    : red.estado === 'conectando' ? 'Conectando…' : 'Sin internet';
+  el.title = `Panel profesional: ${c.panel} · Mi Río: ${c.mirio}`;
+  txtJ.textContent = red.estado === 'en-linea'
+    ? `Conectados ahora: ${c.mirio} en Mi Río · ${c.panel} en el panel profesional`
+    : red.estado === 'conectando' ? 'Conectando…' : 'Sin conexión a internet: revisa la red de esta computadora.';
 });
+$('#btnJueces').addEventListener('click', () => { $('#modalJueces').hidden = false; });
+document.querySelectorAll('[data-cerrar-jueces]').forEach((b) => b.addEventListener('click', () => { $('#modalJueces').hidden = true; }));
+$('#modalJueces').addEventListener('click', (e) => { if (e.target.id === 'modalJueces') $('#modalJueces').hidden = true; });
 canal.enviar({ tipo: 'hola', nodo: NODO_MAQUETA });
 window.addEventListener('beforeunload', () => canal.enviar({ tipo: 'adios', nodo: NODO_MAQUETA }));
 
@@ -1525,6 +1568,10 @@ function iniciarCiclo(opciones = {}) {
   $('#hudLectura').innerHTML = '';
   $('#hudPasos').innerHTML = FASES.map((f, i) => `<div class="hud-paso" data-i="${i}">${i + 1}. ${f.nombre}</div>`).join('');
   canal.enviar({ tipo: 'inicio', nodo: NODO_MAQUETA, solicitud: estado.ciclo.solicitud, origen });
+  if (origen !== 'emergencia' && canal.red.estado === 'en-linea') {
+    const c = contarConectados(canal.red);
+    if (c.panel + c.mirio > 0) avisoMaqueta(`📡 Tomando muestra: el resultado llegará a ${c.panel + c.mirio} ${c.panel + c.mirio === 1 ? 'celular' : 'celulares'} conectados`);
+  }
   if (!estado.seleccion) {
     estado.foco = {
       t: 0,

@@ -1,0 +1,19 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "salas": {
+      "$sala": {
+        ".read": true,
+        "mensajes": {
+          "$id": {
+            ".write": true,
+            ".validate": "!newData.exists() || (newData.hasChildren(['tipo', 't']) && newData.child('tipo').isString() && newData.child('tipo').val().length < 20)"
+          }
+        },
+        "ultima": { "$nodo": { ".write": "$nodo.matches(/^AM-0[1-4]$/)" } },
+        "conectados": { "$id": { ".write": true } }
+      }
+    }
+  }
+}

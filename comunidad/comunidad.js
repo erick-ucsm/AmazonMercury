@@ -197,14 +197,14 @@ const canal = crearCanal((msg) => {
     pintarMidiendo();
   }
   if (msg.tipo === 'resultado' && msg.medicion && insertar(msg.medicion)) {
-    if (msg.medicion.nodo === lugar) {
+    if (msg.medicion.nodo === lugar && !msg.repeticion) {
       const e = estadoDe(msg.medicion);
       aviso(e === 'alerta' ? '⚠ Nueva medición: el río tiene mucho mercurio' : e === 'precaucion' ? 'Nueva medición: cuidado, hay más mercurio' : 'Nueva medición: el río está bien');
       if (e === 'alerta' && navigator.vibrate) navigator.vibrate([200, 100, 200]);
     }
     render();
   }
-});
+}, { pagina: 'mirio' });
 
 $('#btnDetalle').addEventListener('click', () => {
   detalleAbierto = !detalleAbierto;

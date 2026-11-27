@@ -211,26 +211,144 @@ export function generarHistorial(dias = 30, ahora = Date.now()) {
   return salida;
 }
 
-export function crearCanal(alRecibir) {
+const SDK_FIREBASE = 'https://www.gstatic.com/firebasejs/10.14.1';
+const TIPOS_SOLO_LOCALES = new Set(['adios']);
+
+// Canal de mensajes entre la maqueta, el panel y Mi Río.
+// - Dentro de la misma computadora: BroadcastChannel (o localStorage).
+// - Entre dispositivos: Firebase Realtime Database, si comun/firebase-config.js tiene la configuración.
+export function crearCanal(alRecibir, opciones = {}) {
   const NOMBRE = 'amazonmercury-v2';
+  const pagina = opciones.pagina || 'pagina';
+  const yo = `${pagina}-${Math.random().toString(36).slice(2, 10)}`;
+  const vistos = new Set();
+  const oyentesRed = new Set();
+  let red = { estado: 'local', conectados: {} };
+  let fb = null;
+  const pendientes = [];
+
+  const entregar = (msg) => {
+    if (!msg || !msg.tipo) return;
+    if (msg._id) {
+      if (vistos.has(msg._id)) return;
+      vistos.add(msg._id);
+      if (vistos.size > 500) vistos.delete(vistos.values().next().value);
+    }
+    alRecibir(msg);
+  };
+  const avisarRed = () => oyentesRed.forEach((f) => { try { f(red); } catch { /* ignorar */ } });
+
   let bc = null;
   try {
     bc = new BroadcastChannel(NOMBRE);
-    bc.onmessage = (e) => alRecibir(e.data);
+    bc.onmessage = (e) => entregar(e.data);
   } catch {
     bc = null;
     window.addEventListener('storage', (e) => {
       if (e.key !== NOMBRE || !e.newValue) return;
-      try { alRecibir(JSON.parse(e.newValue).msg); } catch { /* ignorar */ }
+      try { entregar(JSON.parse(e.newValue).msg); } catch { /* ignorar */ }
     });
   }
-  return {
-    enviar(msg) {
-      if (bc) bc.postMessage(msg);
-      else {
-        try { localStorage.setItem(NOMBRE, JSON.stringify({ msg, n: Math.random() })); } catch { /* sin almacenamiento */ }
+
+  const enviarRed = (msg) => {
+    if (!fb) { pendientes.push(msg); if (pendientes.length > 30) pendientes.shift(); return; }
+    const { db, sdk, base } = fb;
+    try {
+      const nuevo = sdk.push(sdk.ref(db, `${base}/mensajes`));
+      sdk.set(nuevo, { ...msg, _o: yo, t: sdk.serverTimestamp() }).catch(() => {});
+      setTimeout(() => sdk.remove(nuevo).catch(() => {}), 30000);
+      if (msg.tipo === 'resultado' && msg.medicion && msg.medicion.nodo) {
+        sdk.set(sdk.ref(db, `${base}/ultima/${msg.medicion.nodo}`), { ...msg, _o: yo, t: sdk.serverTimestamp() }).catch(() => {});
       }
+    } catch { /* sin red */ }
+  };
+
+  async function conectarFirebase() {
+    let cfg;
+    try { cfg = await import(new URL('./firebase-config.js', import.meta.url).href); } catch { return; }
+    if (!cfg.FIREBASE_CONFIG || !cfg.FIREBASE_CONFIG.databaseURL) return;
+    const sala = (new URLSearchParams(location.search).get('sala') || cfg.SALA || 'demo').replace(/[^\w-]/g, '').slice(0, 40) || 'demo';
+    red = { estado: 'conectando', conectados: {}, sala };
+    avisarRed();
+    try {
+      const [app, sdk] = await Promise.all([
+        import(`${SDK_FIREBASE}/firebase-app.js`),
+        import(`${SDK_FIREBASE}/firebase-database.js`)
+      ]);
+      const aplicacion = app.getApps().length ? app.getApp() : app.initializeApp(cfg.FIREBASE_CONFIG);
+      const db = sdk.getDatabase(aplicacion);
+      const base = `salas/${sala}`;
+
+      const offset = await new Promise((res) => {
+        const r = sdk.ref(db, '.info/serverTimeOffset');
+        const fin = setTimeout(() => res(0), 4000);
+        sdk.onValue(r, (s) => { clearTimeout(fin); res(s.val() || 0); }, { onlyOnce: true });
+      });
+      const ahora = () => Date.now() + offset;
+      const desde = ahora() - 1500;
+
+      // Mensajes nuevos de otros dispositivos
+      sdk.onChildAdded(sdk.query(sdk.ref(db, `${base}/mensajes`), sdk.orderByChild('t'), sdk.startAt(desde)), (snap) => {
+        const m = snap.val();
+        if (!m || m._o === yo) return;
+        delete m._o; delete m.t;
+        entregar(m);
+      });
+
+      // Última medición de cada nodo, para quien entra tarde
+      try {
+        const ult = await sdk.get(sdk.ref(db, `${base}/ultima`));
+        const lista = Object.values(ult.val() || {}).filter((m) => m && m.t && ahora() - m.t < 6 * 3600e3);
+        lista.forEach((m) => { delete m._o; delete m.t; m.repeticion = true; m.solicitud = null; entregar(m); });
+      } catch { /* sin datos */ }
+
+      // Presencia: quién está conectado
+      const miPresencia = sdk.ref(db, `${base}/conectados/${yo}`);
+      sdk.onValue(sdk.ref(db, '.info/connected'), (s) => {
+        if (s.val() === true) {
+          sdk.onDisconnect(miPresencia).remove().then(() => sdk.set(miPresencia, { pagina, t: sdk.serverTimestamp() })).catch(() => {});
+          red = { ...red, estado: 'en-linea' };
+        } else if (red.estado === 'en-linea') {
+          red = { ...red, estado: 'sin-conexion' };
+        }
+        avisarRed();
+      });
+      sdk.onValue(sdk.ref(db, `${base}/conectados`), (s) => {
+        red = { ...red, conectados: s.val() || {} };
+        avisarRed();
+      });
+
+      // Limpieza de mensajes viejos (solo la maqueta)
+      if (pagina === 'maqueta') {
+        try {
+          const viejos = await sdk.get(sdk.query(sdk.ref(db, `${base}/mensajes`), sdk.orderByChild('t'), sdk.endAt(ahora() - 120000)));
+          viejos.forEach((c) => { sdk.remove(c.ref).catch(() => {}); });
+        } catch { /* ignorar */ }
+      }
+
+      fb = { db, sdk, base };
+      pendientes.splice(0).forEach(enviarRed);
+    } catch (e) {
+      console.warn('[AmazonMercury] No se pudo conectar con Firebase; se usa solo el canal local.', e);
+      red = { ...red, estado: 'sin-conexion' };
+      avisarRed();
     }
+  }
+  conectarFirebase();
+
+  return {
+    yo,
+    enviar(msg, { soloLocal = false } = {}) {
+      const m = { ...msg, _id: `${yo}-${Math.random().toString(36).slice(2, 9)}` };
+      vistos.add(m._id);
+      if (bc) bc.postMessage(m);
+      else {
+        try { localStorage.setItem(NOMBRE, JSON.stringify({ msg: m, n: Math.random() })); } catch { /* sin almacenamiento */ }
+      }
+      if (!soloLocal && !TIPOS_SOLO_LOCALES.has(m.tipo)) enviarRed(m);
+    },
+    alCambiarRed(f) { oyentesRed.add(f); f(red); },
+    get red() { return red; }
   };
 }
 

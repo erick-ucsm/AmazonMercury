@@ -119,7 +119,7 @@ function pintarConexion() {
     : estado.maqueta.ocupada ? `Maqueta 3D (${NODO_MAQUETA}): midiendo…` : `Maqueta 3D (${NODO_MAQUETA}): conectada`;
 }
 
-const canal = crearCanal(recibir);
+const canal = crearCanal(recibir, { pagina: 'panel' });
 canal.enviar({ tipo: 'ping' });
 setInterval(() => {
   canal.enviar({ tipo: 'ping' });
@@ -156,7 +156,7 @@ function recibir(msg) {
     if (insertar(msg.medicion)) {
       estado.idsNuevos.add(msg.medicion.id);
       if (esMia) mostrarResultado(msg.medicion);
-      else {
+      else if (!msg.repeticion) {
         const e = estadoGeneral(msg.medicion);
         aviso(`Nueva lectura de ${msg.medicion.nodo} (maqueta 3D): Hg ${formatearMetal('Hg', msg.medicion.metales.Hg)} µg/L · ${ETIQUETA_ESTADO[e]}`, e === 'alerta' ? 'alerta' : '');
       }
@@ -744,7 +744,7 @@ $('#chkVivo').addEventListener('change', (e) => {
     const med = generarMedicion({ nodo: n.id, escenario: Math.random() < 0.1 ? 'precaucion' : 'normal', origen: 'automatica' });
     med.salud = { ...previo.salud };
     insertar(med);
-    canal.enviar({ tipo: 'resultado', nodo: n.id, medicion: med });
+    canal.enviar({ tipo: 'resultado', nodo: n.id, medicion: med }, { soloLocal: true });
     animarPaquete(n.id);
     renderTodo();
     aviso(`Lectura automática de ${n.id}: Hg ${formatearMetal('Hg', med.metales.Hg)} µg/L`);
