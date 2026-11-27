@@ -1,8 +1,6 @@
 # AmazonMercury · Maqueta 3D + Panel profesional + Mi Río + Pitch
 
 Maqueta 3D interactiva del nodo flotante de monitoreo de mercurio y otros 5 metales (ISC 2027 · Amazonía Viva), con dos paneles conectados en tiempo real: el **panel profesional** (clientes y autoridades) y **Mi Río** (la comunidad), más el **pitch** en diapositivas web.
-## link de la maqueta 3D: https://erick-ucsm.github.io/AmazonMercury/
-## link de las diapositivas: https://erick-ucsm.github.io/AmazonMercury/pitch/
 
 > Todos los datos son **simulados** para la demostración.
 
@@ -25,7 +23,7 @@ AmazonMercury/
 │   ├── index.html
 │   ├── comunidad.css
 │   └── comunidad.js
-├── pitch/                ← pitch de 4:30 (11 diapositivas + 3 anexos)
+├── pitch/                ← pitch de 5:00 (13 diapositivas)
 │   ├── index.html, styles.css, script.js
 │   ├── GUION.md
 │   └── assets/

@@ -1,111 +1,96 @@
-# Guion del pitch · AmazonMercury (4:30)
+# Guion del pitch · AmazonMercury · Equipo EcoRaíz
 
-Pitch de **11 diapositivas** + 3 anexos de respaldo (solo para preguntas). El modelo de negocio ocupa las diapositivas 5 a 8 (≈ 95 s, 35 % del tiempo).
+**Duración total: 5:00** (según la guía de estructura de la mentora). Hablan Erick (CEO) y Jhan (CTO).
 
-Texto hablado: unas **684 palabras**, alrededor de 4:20–4:30 a ritmo pausado. Ensayar con cronómetro al menos 10 veces.
-
-**Reparto:** Erick (CEO) abre, presenta el modelo de negocio y cierra. Jhan David (CTO) presenta la solución, la diferenciación, el impacto y el roadmap.
-
-**Controles:** ← → avanzar · F pantalla completa · N guion con cronómetro · P vista del orador · D demo en vivo.
-
-## Diapositiva 1 · Gancho: Bayolet
-
+## 1. Gancho: Bayolet
 *[Erick] · 0:00–0:20 · tono tranquilo, mirando al jurado*
 
-Bayolet vive en Shintuya, en Madre de Dios. A los 5 años se desmayó dos veces en el colegio. Tenía mercurio en el cuerpo.
+Bayolet vive en Shintuya, una comunidad indígena a orillas del río Madre de Dios. A los 5 años se desmayó dos veces en el colegio: tenía mercurio en el cuerpo.
 
-Su comunidad no tiene minería: el mercurio llegó por el río, dentro de los peces que comía su familia. Hoy tiene 16 años y todavía le cuesta concentrarse.
+Su comunidad no tiene minería; el mercurio llegó por el río, dentro de los peces. Hoy tiene 16 años y todavía le cuesta concentrarse.
 
-## Diapositiva 2 · El problema
+## 2. Problema y evidencia
+*[Erick] · 0:20–1:05 · señalar el mapa, luego los datos y al final la línea*
 
-*[Erick] · 0:20–0:55 · señalar el mapa y luego la línea*
+No es un caso aislado. En 20 años se vertieron unas 3000 toneladas de mercurio en los ríos del Perú.
 
-No es un caso aislado. En 20 años se vertieron 3000 toneladas de mercurio en los ríos del Perú. En Madre de Dios, el 29 % de las gestantes evaluadas y uno de cada tres niños de Amarakaeri superan el límite.
+La Universidad de Duke analizó la sangre de 198 madres de Madre de Dios al dar a luz: el 29 % superaba el nivel de referencia de salud de Estados Unidos. Y en la Reserva Amarakaeri, uno de cada tres niños tenía en el cabello más mercurio del que acepta la OMS.
 
-¿Y por qué nadie lo ve venir? Porque hoy el agua se mide a mano, pocas veces al año. Una auditoría de 2025 dio normal donde otra medición sí halló mercurio. Los picos pasan sin que nadie los vea.
+¿Por qué nadie lo ve venir? Porque el agua se mide pocas veces. En diciembre de 2025, la Contraloría tomó muestras en la quebrada Guacamayo: todo normal. Pero la Autoridad Nacional del Agua, midiendo ahí entre 2021 y 2025, sí halló mercurio sobre el estándar.
 
-## Diapositiva 3 · La solución
+## 3. La solución
+*[Jhan] · 1:05–1:35*
 
-*[Jhan] · 0:55–1:30*
+Por eso creamos AmazonMercury: nodos que flotan en el río y lo miden cada hora.
 
-Por eso creamos AmazonMercury: un nodo que flota y mide el río cada hora. Con voltametría detecta mercurio y otros cinco metales por debajo de los límites de la OMS.
+Cada nodo toma una muestra y, con voltametría, detecta mercurio desde 0,1 microgramos por litro —la OMS pone el límite en 6— y cinco metales más. Envía el dato por radio LoRa, de nodo en nodo, sin señal de celular, y funciona solo con el sol. En minutos, el resultado llega a nuestra plataforma web.
 
-Envía el dato por radio LoRa, sin señal de celular, y funciona solo con energía solar. El resultado llega en minutos a dos paneles: uno profesional y otro para la comunidad.
+## 4. Diferenciación
+*[Jhan] · 1:35–1:55*
 
-(Si hay tiempo e internet: pulsar «Ver la demo en vivo». Si no, seguir.)
+Hoy el muestreo manual da resultados semanas después, y las sondas comerciales no suelen medir mercurio. GalamSense, en Ghana, prueba que la tecnología funciona, pero sigue en demostración.
 
-## Diapositiva 4 · Diferenciación
+Nuestra diferencia: medición cada hora, alerta directa a la comunidad y Guardianes del Río locales que cuidan cada nodo.
 
-*[Jhan] · 1:30–1:55*
+## 5. Prototipo: lo que construimos
+*[Jhan, luego Erick] · 1:55–2:25*
 
-Hoy hay tres alternativas. El muestreo manual da resultados semanas después. Las sondas comerciales normalmente no miden mercurio en el río. Y en Ghana, GalamSense demuestra que la tecnología funciona, pero sigue en demostración.
+[Jhan] Yo diseñé el nodo pieza por pieza: el casco, la cúpula, el panel solar, las baterías, la celda de voltametría y el cálculo de energía, que le da autonomía todo el año.
 
-Nosotros damos un servicio completo: medición cada hora, alerta a la comunidad y Guardianes del Río locales que cuidan cada nodo.
+[Erick] Y yo lo llevé a una maqueta 3D interactiva y programé la plataforma: un panel profesional para clientes y autoridades, y Mi Río, un panel simple para la comunidad. Los tres están conectados en tiempo real: cuando pedimos un diagnóstico, el nodo mide y Mi Río cambia de color.
 
-## Diapositiva 5 · Quién paga y quién se beneficia
+## 6. Qué funciona y qué falta validar
+*[Erick] · 2:25–2:50*
 
-*[Erick] · 1:55–2:20*
+Seamos claros sobre lo que tenemos. Funciona: el diseño completo, la maqueta y las dos plataformas. Usa datos simulados: las lecturas y el historial.
 
-Nuestro modelo separa a quien paga de quien se beneficia. Pagan la minería formal y el Estado, que ven el panel profesional. La comunidad recibe gratis Mi Río: un semáforo simple que le dice si puede usar el agua hoy.
+Falta validar la precisión en agua real frente a un laboratorio acreditado, el consumo real de energía, la resistencia en el río y el precio con clientes. Ese es nuestro siguiente paso.
 
-El mismo dato llega a los dos al mismo tiempo, y el cliente no puede editarlo. Y por cada cinco nodos vendidos, financiamos uno comunitario.
+## 7. Impacto medible
+*[Jhan] · 2:50–3:20*
 
-## Diapositiva 6 · ¿Por qué pagaría una minera?
+¿Qué cambia? Pasamos de unas pocas muestras al año a una cada hora, y de semanas a minutos para alertar.
 
-*[Erick] · 2:20–2:40*
+Lo medimos con cuatro indicadores: mediciones al año, tiempo hasta la alerta, nodos comunitarios gratuitos y empleos de Guardianes del Río. A dos años: 18 nodos y más de 150 000 mediciones al año. Protegemos a las familias y también a los peces y las aves del río: agua limpia, salud y biodiversidad.
 
-¿Por qué pagaría una minera? Porque ya está obligada a monitorear el agua; porque el agua está detrás de los 96 conflictos socioambientales activos; porque el OEFA impuso 110 millones en multas en cien días; y porque unas 30 empresas ya trabajan con comités de monitoreo con la comunidad.
+## 8. Quién paga y quién se beneficia
+*[Erick] · 3:20–3:35*
 
-Nosotros lo hacemos continuo y creíble.
+¿Quién paga? La minería formal y el Estado, como un servicio mensual. La comunidad recibe las alertas gratis, y el cliente no puede editar los datos. Por cada cinco nodos vendidos, financiamos uno comunitario.
 
-## Diapositiva 7 · Ingresos y números por nodo
+## 9. ¿Por qué pagaría una minera?
+*[Erick] · 3:35–3:45*
 
-*[Erick] · 2:40–3:10 · señalar la barra*
+La minería ya está obligada a monitorear el agua, enfrenta 96 conflictos socioambientales activos y multas millonarias del OEFA: el monitoreo continuo le conviene.
 
-Cobramos 1800 soles por nodo al mes a la minería y 1200 al sector público, todo incluido. Nos cuesta 769; lo principal es el Guardián del Río, un poblador capacitado al que pagamos 30 % más que el sueldo mínimo. Nos queda un margen de 57 %.
+## 10. Ingresos y costos
+*[Erick] · 3:45–4:00*
 
-Cada cliente nos cuesta unos 8000 soles y nos deja nueve veces más en dos años. Llegamos al equilibrio con nueve nodos, unos tres clientes, entre el mes 15 y el 18.
+Cobramos 1800 soles por nodo al mes. Fabricar un nodo cuesta unos 3150 soles y operarlo, 769 al mes, incluido el sueldo del Guardián del Río. Nos queda un margen de 57 %, y con unos tres clientes cubrimos nuestros gastos.
 
-## Diapositiva 8 · Mercado y crecimiento
+## 11. Siguiente paso: el piloto
+*[Jhan] · 4:00–4:15*
 
-*[Erick] · 3:10–3:30*
+Para el piloto necesitamos 10 000 soles: dos nodos reales, validación con laboratorio y logística en Madre de Dios. En 4 meses, prototipo validado; a los 9, piloto con Guardianes; al mes 15, primer cliente.
 
-En el Perú hay 715 unidades mineras en explotación: un mercado de unos 46 millones de soles al año. Nuestra meta realista a dos años son 5 clientes y 15 nodos: 324 000 soles al año.
+## 12. Equipo emprendedor
+*[Jhan, luego Erick] · 4:15–4:50 · mirar al compañero al presentarlo*
 
-Empezamos por Madre de Dios y el sur, y luego crecemos a otros ríos y países.
+[Jhan] Soy Jhan David, CTO. Mi fuerte es el hardware: diseñé el nodo, los sensores y la energía, y voy a liderar la fabricación, la validación y el trabajo con los Guardianes del Río.
 
-## Diapositiva 9 · Impacto medible
+[Erick] Yo soy Erick, CEO. Mi fuerte es el software y los datos: hice la maqueta y las plataformas, y lidero las ventas y las alianzas.
 
-*[Jhan] · 3:30–3:55*
+[Jhan] Lo que yo construyo para el río, Erick lo convierte en datos que la gente entiende.
 
-El impacto crece con las ventas. Pasamos de unas pocas muestras al año a una cada hora, con alertas en minutos.
+[Erick] Por eso todo lo que vieron lo hicimos juntos. Y vamos a seguir hasta poner el primer nodo en el agua.
 
-A dos años: más de 150 000 mediciones al año, tres nodos comunitarios gratuitos y tres empleos formales de Guardianes del Río. Aportamos a los ODS 6 y 3.
+## 13. Cierre: inviertan en nosotros
+*[Erick] · 4:50–5:00 · más lento, pausa antes de «Nosotros sí»*
 
-## Diapositiva 10 · Tracción y equipo
+El mercurio no se ve, no se huele y no avisa. (Pausa) Nosotros sí.
 
-*[Jhan, luego Erick] · 3:55–4:20*
+Inviertan en AmazonMercury y ayúdennos a que el río de Bayolet pueda avisar a tiempo. Gracias.
 
-[Jhan] Ya construimos el nodo en 3D y los dos paneles, conectados en tiempo real: pueden probarlos con estos códigos. En 4 meses tendremos el prototipo real validado con laboratorio; a los 9, un piloto en Madre de Dios; y al mes 15, nuestro primer cliente minero. Yo soy Jhan David, de Mecatrónica, el CTO: llevo el hardware y la operación en campo.
+---
+Total: unas 756 palabras, unos 5 minutos a ritmo tranquilo (≈150 palabras por minuto).
 
-[Erick] Y yo soy Erick, de Ingeniería de Sistemas, el CEO: llevo el producto, las ventas y las alianzas.
-
-## Diapositiva 11 · Lo que pedimos y cierre
-
-*[Erick] · 4:20–4:30 · más lento al final*
-
-Pedimos 10 000 soles de capital semilla: 63 % para construir dos nodos reales, 25 % para validarlos con laboratorio y 12 % para el piloto. Con eso, en nueve meses, el río de Madre de Dios tendrá sus primeros vigilantes.
-
-El mercurio no se ve, no se huele y no avisa. (Pausa) Nosotros sí. Gracias.
-
-## Anexo A · Anexo A · Costos por nodo
-
-*Diapositiva de respaldo. Usar solo si el jurado pregunta por costos o márgenes.*
-
-## Anexo B · Anexo B · Tecnología y energía
-
-*Diapositiva de respaldo. Usar si preguntan por la precisión del sensor, la batería o el mantenimiento.*
-
-## Anexo C · Anexo C · Preguntas difíciles
-
-*Diapositiva de respaldo. Respuestas cortas para la ronda de preguntas.*
