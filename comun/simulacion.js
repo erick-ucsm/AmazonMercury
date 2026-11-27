@@ -265,7 +265,7 @@ export function crearCanal(alRecibir, opciones = {}) {
 
   async function conectarFirebase() {
     let cfg;
-    try { cfg = await import(new URL('./firebase-config.js', import.meta.url).href); } catch { return; }
+    try { cfg = await import(`${new URL('./firebase-config.js', import.meta.url).href}?v=${Date.now()}`); } catch { return; }
     if (!cfg.FIREBASE_CONFIG || !cfg.FIREBASE_CONFIG.databaseURL) return;
     const sala = (new URLSearchParams(location.search).get('sala') || cfg.SALA || 'demo').replace(/[^\w-]/g, '').slice(0, 40) || 'demo';
     red = { estado: 'conectando', conectados: {}, sala };
